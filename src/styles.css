@@ -1,1 +1,24 @@
-/* You can add global styles to this file, and also import other style files */
+
+@import '~https://fonts.googleapis.com/icon?family=Material+Icons';
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+
+body {
+    margin: 7% auto;
+    font-family: Roboto, sans-serif;
+    max-width: 500px;
+    max-height: 800px;
+    height: 800px;
+    border: 0.5px solid #ccc;
+    padding:1em;
+
+}
+
+mat-card {
+    max-width: 80%;
+    margin: 2em auto;
+    text-align: center;
+}
+
+mat-toolbar-row {
+    justify-content: space-between;
+}
