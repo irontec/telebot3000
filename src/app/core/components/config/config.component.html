@@ -1,3 +1,43 @@
-<p>
-  config works!
-</p>
+<form *ngIf="(UA.status | async) as status" [formGroup]="configForm" class="container">
+
+    <mat-form-field>
+        <input matInput placeholder="WS URI" formControlName="wsuri">
+        <mat-hint align="end">wss://example.com/endpoint</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field>
+        <input matInput placeholder="SIP URI" formControlName="sipuri">
+        <mat-hint align="end">user@example.com</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field>
+        <input matInput placeholder="password" [type]="hidePassword ? 'password' : 'text'" formControlName="password">
+        <mat-icon matSuffix (click)="hidePassword = !hidePassword">{{hidePassword ? 'visibility' : 'visibility_off'}}</mat-icon>
+    </mat-form-field>
+
+    <div class="mat-form-field">
+        <mat-slide-toggle matInput formControlName="autosave">Save configuration on this computer</mat-slide-toggle>
+    </div>
+
+    <div class="mat-form-field">
+        <mat-slide-toggle matInput formControlName="autoconnect">Auto connect on startup</mat-slide-toggle>
+    </div>
+
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title>Extra configuration</mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <mat-form-field>
+            <textarea matInput placeholder="Ice Servers URLs" spellcheck="false" formControlName="stuns"></textarea>
+            <mat-hint align="start">stun:example.com:0000</mat-hint>
+            <mat-hint align="end">Every line will be used as a URL</mat-hint>
+        </mat-form-field>
+
+    </mat-expansion-panel>
+
+    <div class="button-row">
+        <button *ngIf="!status.connected" mat-raised-button color="primary" (click)="UA.connect()">Connect</button>
+        <button *ngIf="status.connected" mat-raised-button color="accent" (click)="UA.disconnect()">Disconnect</button>
+    </div>
+</form>

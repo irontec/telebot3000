@@ -27,6 +27,7 @@
     "core-js": "^2.4.1",
     "hammerjs": "^2.0.8",
     "jssip": "^3.0.23",
+    "localforage": "^1.5.3",
     "rxjs": "^5.5.2",
     "talkify-tts": "^1.1.4",
     "zone.js": "^0.8.14"

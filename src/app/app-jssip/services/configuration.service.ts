@@ -4,18 +4,21 @@ import { WebSocketInterface} from 'jssip';
 @Injectable()
 export class ConfigurationService {
 
-    public host: string;
-    public uri: string;
+    public wsuri: string;
+    public sipuri: string;
     public password: string;
+    public autoconnect = false;
+    public autosave = false;
+    private _stuns: string[] = [];
 
     constructor() {
     }
 
     _generateSocket() {
-        if (!this.host) {
+        if (!this.wsuri) {
             throw new Error('host not defined');
         }
-        return new WebSocketInterface(this.host);
+        return new WebSocketInterface(this.wsuri);
     }
 
     getConfiguration() {
@@ -24,7 +27,7 @@ export class ConfigurationService {
         }
         return {
             sockets: [this._generateSocket()],
-            uri: this.uri,
+            uri: this.sipuri,
             password: this.password,
             autoConnect: false,
             register: true,
@@ -41,12 +44,20 @@ export class ConfigurationService {
         };
     }
 
+    get stuns() {
+        return  this._stuns.join('\n');
+    }
+
+    set stuns(stuns) {
+        this._stuns = stuns.split('\n').filter(s => s !== '');
+    }
+
     getPcConfig() {
-        return { 'iceServers': [ {'urls': ['stun:stun.l.google.com:19302']} ], 'gatheringTimeout': 2000 };
+        return { 'iceServers': [ {'urls': this._stuns} ], 'gatheringTimeout': 2000 };
     }
 
     private _isValid() {
-         return this.host != null && this.uri != null && this.password != null;
+         return this.wsuri != null && this.sipuri != null && this.password != null;
     }
 
 }

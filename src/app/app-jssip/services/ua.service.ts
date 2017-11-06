@@ -1,4 +1,6 @@
 import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/observable/fromEvent';
 import 'rxjs/add/observable/merge';
 import 'rxjs/add/operator/map';
@@ -12,6 +14,7 @@ import { UA } from 'jssip';
 import { ConfigurationService } from './configuration.service';
 import {
     UAEvent,
+    UAStatus,
     UAMessage,
     UAMessageData,
     UAconnectingData,
@@ -24,13 +27,14 @@ import {
     UAnewMessageData,
     UAnewRTCSessionData
 } from '../utils';
-import { Session } from './session';
+import { Session } from './utils/session';
 
 @Injectable()
 export class UaService {
 
-    public notifier: Observable<UAMessage>;
-    public connection: Observable<boolean>;
+    public notifier: Subject<UAMessage>;
+    public status: BehaviorSubject<UAStatus>;
+
     private ua: UA;
 
     private audioElement: HTMLAudioElement;
@@ -39,19 +43,24 @@ export class UaService {
         private config: ConfigurationService,
         private ngZone: NgZone
     ) {
+
+        this.notifier = new Subject<UAMessage>();
+        this.status = new BehaviorSubject<UAStatus>(this._generateStatus('disconnected'));
+
+
     }
 
     connect() {
         this.ua = new UA(this.config.getConfiguration());
-        this.notifier = this._generateMsgObservable();
-        this.connection = this._generateConnectionObservable();
         this.ngZone.runOutsideAngular(() => {
             this.ua.start();
         });
+        this._wireMessageSubject();
+        this._wireStatusSubject();
     }
 
     disconnect() {
-        this.ua.unregister({all: true});
+        this.ua.unregister({ all: true });
         this.ua.stop();
     }
 
@@ -62,13 +71,13 @@ export class UaService {
     call(target) {
         const st = this.GenerateStream();
         this.ua.call(target, {
-            'mediaStream' : st,
-            'mediaConstraints': {'audio': true, 'video': false},
+            'mediaStream': st,
+            'mediaConstraints': { 'audio': true, 'video': false },
             'pcConfig': this.config.getPcConfig(),
             rtcOfferConstraints: {
                 offerToReceiveAudio: 1,
                 offerToReceiveVideo: 0
-              }
+            }
         });
     }
 
@@ -97,34 +106,43 @@ export class UaService {
 
     }
 
-    private _generateMsgObservable(): Observable<UAMessage> {
+    private _wireMessageSubject(): void {
 
-        return Observable.merge(
-            Observable.fromEvent(this.ua, 'connecting').map(e => this._parseEvent('connecting', e)),
-            Observable.fromEvent(this.ua, 'connected').map(e => this._parseEvent('connected', e)),
-            Observable.fromEvent(this.ua, 'disconnected').map(e => this._parseEvent('disconnected', e)),
-            Observable.fromEvent(this.ua, 'registered').map(e => this._parseEvent('registered', e)),
-            Observable.fromEvent(this.ua, 'unregistered').map(e => this._parseEvent('unregistered', e)),
-            Observable.fromEvent(this.ua, 'registrationFailed').map(e => this._parseEvent('registrationFailed', e)),
-            Observable.fromEvent(this.ua, 'registrationExpiring').map(e => this._parseEvent('registrationExpiring', e)),
-            Observable.fromEvent(this.ua, 'newRTCSession').map(e => this._parseEvent('newRTCSession', e)),
-            Observable.fromEvent(this.ua, 'newMessage').map(e => this._parseEvent('newMessage', e))
-        )
-        .publish()
-        .refCount();
+        [
+            'connected',
+            'disconnected',
+            'registered',
+            'unregistered',
+            'registrationFailed',
+            'registrationExpiring',
+            'newRTCSession',
+            'newMessage'
+        ].map(event => {
+            this.ua.on(event, e =>
+                this.ngZone.run(() => this.notifier.next(this._parseEvent(<UAEvent>event, e)))
+            );
+        });
+
     }
 
-    private _generateConnectionObservable(): Observable<boolean> {
+    private _wireStatusSubject(): void {
+        [
+            'connected',
+            'disconnected',
+            'registered',
+            'unregistered'
+        ].map(event => {
+            this.ua.on(event, e =>
+                this.ngZone.run(() => this.status.next(this._generateStatus(<UAEvent>event)))
+            );
+        });
+    }
 
-        return Observable.merge(
-            Observable.fromEvent(this.ua, 'connected').map(e => true),
-            Observable.fromEvent(this.ua, 'disconnected').map(e => false),
-            Observable.fromEvent(this.ua, 'registered').map(e => true),
-            Observable.fromEvent(this.ua, 'unregistered').map(e => false),
-        )
-        .do(c=>console.log("Connn", c))
-        .publishReplay(1)
-        .refCount();
+    private _generateStatus(status: UAEvent): UAStatus {
+        return {
+            connected: (status === 'connected' || status === 'registered'),
+            status
+        };
     }
 
 
@@ -183,6 +201,9 @@ export class UaService {
 
     private _hydratePayload<T>(event, fields): T {
         return <T>fields.reduce((ret, field) => {
+            if (!event) {
+                return ret;
+            }
             ret[field] = event[field] || null;
             return ret;
         }, {});

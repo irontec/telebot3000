@@ -1,24 +1,24 @@
-<span *ngIf="(connection | async) as connection">
-<div class="target">
-    <mat-form-field [hideRequiredMarker]="true">
-        <input matInput placeholder="Who are you gonna call?" [formControl]="targetControl" required (keyup.enter)="callIt(connection.status)">
-    </mat-form-field>
-</div>
+<div class="container" *ngIf="(UA.status | async) as status">
+    <div class="target">
+        <mat-form-field [hideRequiredMarker]="true">
+            <input matInput placeholder="Who are you gonna call?" [formControl]="targetControl" required (keyup.enter)="callIt(status.connected)">
+        </mat-form-field>
+    </div>
 
 
-<div class="pad">
-    <mat-grid-list cols="3" rowHeight="100px">
-        <ng-template ngFor [ngForOf]="buttons" let-button>
-            <mat-grid-tile>
-                <button mat-fab color="primary" (click)="buttonPressed(button)">{{ button }}</button>
+    <div class="pad">
+        <mat-grid-list cols="3" rowHeight="100px">
+            <ng-template ngFor [ngForOf]="buttons" let-button>
+                <mat-grid-tile>
+                    <button mat-fab color="primary" (click)="buttonPressed(button)">{{ button }}</button>
+                </mat-grid-tile>
+            </ng-template>
+
+            <mat-grid-tile colspan="3">
+                <button [disabled]="!status.connected" mat-fab color="accent" (click)="callIt(status.connected)">
+                    <mat-icon>phone</mat-icon>
+                </button>
             </mat-grid-tile>
-        </ng-template>
-
-        <mat-grid-tile colspan="3">
-            <button [disabled]="!connection.status" mat-fab color="accent" (click)="callIt(connection.status)">
-                <mat-icon>phone</mat-icon>
-            </button>
-        </mat-grid-tile>
-    </mat-grid-list>
+        </mat-grid-list>
+    </div>
 </div>
-</span>

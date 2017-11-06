@@ -15,6 +15,11 @@ export type UAEvent = 'connecting' |
     'newRTCSession' |
     'newMessage';
 
+export interface UAStatus {
+    connected: boolean;
+    status: UAEvent;
+}
+
 export type originator = 'remote' | 'local';
 
 export type sessionStatus = 'ringing' | 'active' | 'paused' | 'finished';

@@ -22,3 +22,7 @@ mat-card {
 mat-toolbar-row {
     justify-content: space-between;
 }
+
+.container {
+    margin:2em 0 1em 0;
+}

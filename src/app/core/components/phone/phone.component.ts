@@ -1,10 +1,10 @@
 import { Component, OnInit, HostListener, NgZone } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { UaService } from './../../../app-jssip/services/ua.service';
+
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/startWith';
 import 'rxjs/add/operator/do';
-
 import 'rxjs/add/operator/map';
 
 @Component({
@@ -30,7 +30,6 @@ export class PhoneComponent implements OnInit {
             const cleanVal = val.replace(cleanRegExp, '');
             this.targetControl.setValue(cleanVal, {emitEvent: false, emitModelToViewChange: true});
         });
-        this.connection = this.UA.connection.startWith(false).map(status => { return { status }; }).do(c=>console.log(c));
     }
 
     buttonPressed(button) {
@@ -44,6 +43,19 @@ export class PhoneComponent implements OnInit {
             e.preventDefault();
             this.buttonPressed(e.key);
         }
+
+        if (e.key === 'Backspace') {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+            this.targetControl.setValue(`${this.targetControl.value.slice(0, -1)}`);
+        }
+
+        if (e.key === 'Escape') {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+            this.targetControl.setValue('');
+        }
+
 
     }
 

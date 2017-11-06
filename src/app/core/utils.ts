@@ -1,6 +1,12 @@
 export interface ConnectionStatus {
-    connected: boolean;
-    registered: boolean;
     who: string;
     last: Date;
+}
+
+
+
+export interface Call {
+    target: string;
+    type: string;
+
 }

@@ -1,24 +1,34 @@
-<div>
-    <mat-toolbar color="primary" *ngIf="(connectionStatus | async) as connStatus">
-      <span><mat-icon *ngIf="connStatus.registered">mood</mat-icon></span>
+<div *ngIf="(UA.status | async) as status">
+    <mat-toolbar color="primary">
+        <span>
+            <mat-icon *ngIf="status.connected && status.status === 'registered'; else disconnectedIcon">mood</mat-icon>
+            <ng-template #disconnectedIcon>
+                <mat-icon class="error">mood_bad</mat-icon>
+            </ng-template>
+        </span>
+        <div class="title">
+            <div>Telebot 3000</div>
+            <div class="who" *ngIf="(connectionStatus | async) as connStatus">
+                (<strong>{{ connStatus.who }}</strong>)
+            </div>
+        </div>
 
-      <span>Telebot 3000</span>
-      <span>{{ connStatus.who }} </span>
-
-      <button mat-icon-button [mat-menu-trigger-for]="menu">
-        <mat-icon>more_vert</mat-icon>
-      </button>
+        <button mat-icon-button [mat-menu-trigger-for]="menu">
+            <mat-icon>more_vert</mat-icon>
+        </button>
     </mat-toolbar>
 
     <mat-menu x-position="before" #menu="matMenu">
-      <button mat-menu-item routerLink="/phone"><mat-icon>dialpad</mat-icon>Phone</button>
-      <button mat-menu-item routerLink="/callslist"><mat-icon>format_list_bulleted</mat-icon>Calls List</button>
-      <button mat-menu-item routerLink="/config"><mat-icon>build</mat-icon>Config</button>
+        <button mat-menu-item routerLink="/phone">
+            <mat-icon>dialpad</mat-icon>Phone</button>
+        <button mat-menu-item routerLink="/callslist">
+            <mat-icon>format_list_bulleted</mat-icon>Calls List</button>
+        <button mat-menu-item routerLink="/config">
+            <mat-icon>build</mat-icon>Config</button>
     </mat-menu>
 
     <router-outlet></router-outlet>
 
-    <audio #audioItem autoPlay></audio>
-    <audio id="lew" src="/assets/deberes.mp3" loop></audio>
-
-  </div>
+</div>
+<audio #audioItem autoPlay></audio>
+<audio id="lew" src="assets/deberes.mp3" loop></audio>

@@ -1,5 +1,5 @@
 import { session as JSSipSession, Utils as JSSIPUtils, stream as JSSIPStream } from 'jssip';
-import { sessionStatus } from '../utils';
+import { sessionStatus } from '../../utils';
 import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/observable/of';
 
@@ -30,7 +30,7 @@ export class Session {
         return this._session.id;
     }
 
-    get userTarget() {
+    get target() {
         return this._session.remote_identity.uri.user;
     }
 
@@ -149,9 +149,6 @@ export class Session {
         this.muted.next(false);
         this._session.unmute();
     }
-
-
-
 
 
 }

@@ -1,0 +1,23 @@
+.container {
+        display: flex;
+        flex-direction: column;
+}
+
+.mat-form-field, .mat-expansion-panel {
+    width:80%;
+    margin:0 auto;
+    line-height: 1.125;
+}
+
+
+.mat-expansion-panel {
+    margin-top:3em;
+}
+
+.button-row {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: space-around;
+    margin:3em;
+}
