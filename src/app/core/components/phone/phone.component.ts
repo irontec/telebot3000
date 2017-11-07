@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener, NgZone } from '@angular/core';
+import { Component, OnInit, HostListener, ViewChild, Renderer, ElementRef } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { UaService } from './../../../app-jssip/services/ua.service';
 
@@ -13,14 +13,13 @@ import 'rxjs/add/operator/map';
     styleUrls: ['./phone.component.scss']
 })
 export class PhoneComponent implements OnInit {
+    @ViewChild('callButton', {read: ElementRef}) private callButton: ElementRef;
 
-    buttons = [
-        '1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'
-    ];
-    public connection: Observable<any>;
+    buttons = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'];
     public targetControl = new FormControl('', [Validators.pattern('^[0-9#*]*$')]);
 
     constructor(
+        private renderer: Renderer,
         private UA: UaService
     ) { }
 
@@ -56,11 +55,20 @@ export class PhoneComponent implements OnInit {
             this.targetControl.setValue('');
         }
 
+        if (e.key === 'Enter' && this.targetControl.value !== '') {
+            e.stopImmediatePropagation();
+            e.preventDefault();
 
+            this.renderer.invokeElementMethod(
+                this.callButton.nativeElement,
+                'dispatchEvent',
+                [new MouseEvent('click', {bubbles: true})]
+            );
+        }
     }
 
     callIt(isConnected = null) {
-        if (!isConnected) {
+        if (!isConnected || this.targetControl.value === '') {
             return;
         }
         this.UA.call(this.targetControl.value);

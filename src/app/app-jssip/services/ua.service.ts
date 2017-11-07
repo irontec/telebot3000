@@ -27,7 +27,7 @@ import {
     UAnewMessageData,
     UAnewRTCSessionData
 } from '../utils';
-import { Session } from './utils/session';
+import { Session } from './ua.service/session';
 
 @Injectable()
 export class UaService {
@@ -70,14 +70,17 @@ export class UaService {
 
     call(target) {
         const st = this.GenerateStream();
-        this.ua.call(target, {
-            'mediaStream': st,
-            'mediaConstraints': { 'audio': true, 'video': false },
-            'pcConfig': this.config.getPcConfig(),
-            rtcOfferConstraints: {
-                offerToReceiveAudio: 1,
-                offerToReceiveVideo: 0
-            }
+        this.ngZone.run(() => {
+            this.ua.call(target, {
+                'mediaStream': st,
+                'mediaConstraints': { 'audio': true, 'video': false },
+                'pcConfig': { 'iceServers': [ {'urls': ['stun:stun.l.google.com:19302']} ], 'gatheringTimeout': 2000 },
+
+                rtcOfferConstraints: {
+                    offerToReceiveAudio: 1,
+                    offerToReceiveVideo: 0
+                }
+            });
         });
     }
 
@@ -91,14 +94,14 @@ export class UaService {
         const source = audioCtx.createMediaElementSource(el);
         source.connect(target);
         el.play();
-        setTimeout(() => {
+/*        setTimeout(() => {
             el.pause();
-        }, 15000);
+        }, 15000);*/
 
-        setTimeout(() => {
+        /*setTimeout(() => {
             el.src = 'assets/desconocido.mp3';
             el.play();
-        }, 18000);
+        }, 18000);*/
 
 
         return target.stream;
@@ -179,8 +182,8 @@ export class UaService {
                 break;
             }
             case 'newRTCSession': {
-                payload = this._hydratePayload<UAnewRTCSessionData>(event, ['originator', 'session', 'request']);
-                payload['session'] = new Session(payload['session'], this.audioElement);
+                payload = this._hydratePayload<UAnewRTCSessionData>(event, ['originator', 'request']);
+                payload['session'] = new Session(event['session'], this.audioElement);
                 break;
             }
             case 'newMessage': {

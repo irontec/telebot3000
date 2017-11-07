@@ -1,36 +1,31 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 // import * as call from './../../../app-jssip/utils';
 
+import { CallspollService } from './../../../app-jssip/services/callspoll.service';
+import { Call } from './../../../app-jssip/services/ua.service/call';
+import { UaService } from './../../../app-jssip/services/ua.service';
+
 @Component({
-  selector: 'app-callslist',
-  templateUrl: './callslist.component.html',
-  styleUrls: ['./callslist.component.scss']
+    selector: 'app-callslist',
+    templateUrl: './callslist.component.html',
+    styleUrls: ['./callslist.component.scss']
 })
-export class CallslistComponent implements OnInit {
+export class CallslistComponent implements OnInit, OnDestroy {
 
-    calls = [];
-  constructor() { }
+    constructor(
+        private callsPool: CallspollService,
+        private UA: UaService
+    ) { }
 
-  ngOnInit() {
+    ngOnInit() {
 
-    this.calls = [
-        {
-            target: '695161132',
-            type: 'IN',
-            duration: '00:10:01'
-        },
-        {
-            target: '201',
-            type: 'IN',
-            duration: '01:06:11'
-        },
-        {
-            target: '203',
-            type: 'OUT',
-            duration: '00:22:11'
-        }
+    }
 
-    ];
-  }
+    ngOnDestroy() {
+
+    }
+
+
 
 }

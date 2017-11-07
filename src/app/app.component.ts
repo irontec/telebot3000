@@ -1,15 +1,17 @@
-import { register } from 'ts-node/dist';
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/scan';
-import 'rxjs/add/observable/of';
 
-import { ConfigurationService } from './app-jssip/services/configuration.service';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
+import { Router } from '@angular/router';
+
 import { ConfigurationStoreService } from './app-jssip/services/configuration-store.service';
+import { ConfigurationService } from './app-jssip/services/configuration.service';
+import { CallspollService } from './app-jssip/services/callspoll.service';
 import { UaService } from './app-jssip/services/ua.service';
-
-import { UAMessage, UAEvent, UAregisteredData } from './app-jssip/utils';
+import { UAMessage, UAregisteredData, UAnewRTCSessionData} from './app-jssip/utils';
+import { Call } from './app-jssip/services/ua.service/call';
 import { ConnectionStatus } from './core/utils';
 
 
@@ -19,19 +21,23 @@ import { ConnectionStatus } from './core/utils';
     styleUrls: ['./app.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
 
     @ViewChild('audioItem') audioElement;
     public connectionStatus: Observable<ConnectionStatus>;
+    private alive = false;
 
     constructor(
         private configuration: ConfigurationService,
         private configurationStore: ConfigurationStoreService,
-        private UA: UaService
+        private callsPool: CallspollService,
+        private UA: UaService,
+        private router: Router
     ) {
     }
 
     public ngOnInit(): void {
+        this.alive = true;
 
         this.configurationStore.applyConfiguration().subscribe(ret => {
             if (this.configuration.autoconnect) {
@@ -41,6 +47,22 @@ export class AppComponent implements OnInit {
 
         this.UA.registerAudioNode(this.audioElement.nativeElement);
         this.connectionStatus = this._generateConnectionStatusFeed();
+
+
+        // Manage incoming/outgoing calls
+        this.UA.notifier
+                .filter(uaMsg => uaMsg.event === 'newRTCSession')
+                .map(uaMsg => uaMsg.data)
+                .takeWhile(() => this.alive)
+                .subscribe((rtcData: UAnewRTCSessionData) => {
+
+                    const call = new Call();
+                    call.setSession(rtcData);
+                    this.callsPool.addCall(call);
+
+
+                    this.router.navigate(['callslist']);
+                });
     }
 
 
@@ -68,5 +90,9 @@ export class AppComponent implements OnInit {
             .scan((acc, cur) => {
                 return { ...acc, ...cur };
             });
+    }
+
+    public ngOnDestroy() {
+        this.alive = false;
     }
 }

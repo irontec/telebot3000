@@ -15,7 +15,7 @@
             </ng-template>
 
             <mat-grid-tile colspan="3">
-                <button [disabled]="!status.connected" mat-fab color="accent" (click)="callIt(status.connected)">
+                <button #callButton [disabled]="!status.connected" mat-fab color="accent" (click)="callIt(status.connected)">
                     <mat-icon>phone</mat-icon>
                 </button>
             </mat-grid-tile>

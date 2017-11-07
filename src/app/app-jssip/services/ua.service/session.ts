@@ -1,6 +1,10 @@
 import { session as JSSipSession, Utils as JSSIPUtils, stream as JSSIPStream } from 'jssip';
-import { sessionStatus } from '../../utils';
+
+import { CallType, CallDirection, CallIntalkSubtype } from '../../utils';
+
 import { Subject } from 'rxjs/Subject';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+
 import 'rxjs/add/observable/of';
 
 /**
@@ -9,7 +13,10 @@ import 'rxjs/add/observable/of';
 export class Session {
 
     private _session: JSSipSession;
-    public status = new Subject<sessionStatus>();
+
+    public status = new BehaviorSubject<CallType>('ringing');
+    public inTalkStatus = new Subject<CallIntalkSubtype>();
+
     public muted = new Subject<boolean>();
 
     private node: HTMLAudioElement;
@@ -18,12 +25,13 @@ export class Session {
     constructor(sessionRaw: JSSipSession, node: HTMLAudioElement) {
         this._session = sessionRaw;
         this.node = node;
-        this.status.next('ringing');
+        this.inTalkStatus.next(null);
+
         this._wireUpEvents();
     }
 
-    get type() {
-        return this._session['direction'] === 'incoming' ? 'IN' : 'OUT';
+    get direction(): CallDirection {
+        return this._session['_direction'] === 'incoming' ? 'IN' : 'OUT';
     }
 
     get id() {
@@ -43,31 +51,41 @@ export class Session {
             .on('connecting', (e) => this.onConnecting())
             .on('progress', (e) => this.onProgress())
             .on('accepted', (e) => this.onAccepted(e))
-            .on('failed', (e) => this.onFailed())
+            .on('failed', (e) => this.onFailed(e))
             .on('newDTMF', (e) => this.onDTMF(e))
             .on('hold', (e) => this.onHold())
             .on('unhold', (e) => this.onUnhold())
             .on('ended', (e) => this.onEnded())
             .on('update', (e) => this.onUpdate());
 
-        this._session.connection.addEventListener('addstream', (e) => this.onStreamAdded(e));
+        if (this._session.connection) {
+            this._session.connection.addEventListener('addstream', (e) => this.onStreamAdded(e));
+        } else {
+            console.log("NOT SESSION!");
+        }
     }
 
-
-
     onConnecting() {
+        console.log('connecting');
         if (this._session.connection.getSenders().length > 0) {
             this._localStream = this._session.connection.getSenders()[0];
         }
     }
 
     onProgress() {
+        this.status.next('ringing');
+    }
 
+    onFailed(e) {
+        this.status.next('done');
+        console.log('failed!! wtf????', e);
     }
 
     onAccepted(e: any) {
 
+        console.log('acepted');
         this.status.next('active');
+        this.inTalkStatus.next('talking');
 
         if (this._session.connection.getSenders().length > 0) {
             this._localStream = this._session.connection.getSenders()[0];
@@ -97,16 +115,18 @@ export class Session {
     }
 
     onHold() {
-        this.status.next('paused');
+        this.inTalkStatus.next('hold');
+
     }
 
     onUnhold() {
-        this.status.next('active');
+        this.inTalkStatus.next('talking');
     }
 
     onEnded() {
+        console.log("eneded???");
         this.muted.complete();
-        this.status.next('finished');
+        this.status.next('done');
         /*var startTime = this.moment(this.session.start_time);
         var endTime = this.moment(this.session.end_time);
         var duration = this.moment.duration(endTime.diff(startTime));
@@ -117,11 +137,8 @@ export class Session {
     }
 
     onUpdate() {
-        this.status.next('finished');
-    }
-
-    onFailed() {
-        this.status.next('finished');
+        console.log("on updated");
+        this.status.next('done');
     }
 
     hangup() {

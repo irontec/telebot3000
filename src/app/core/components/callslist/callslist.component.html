@@ -1,15 +1,48 @@
 <mat-list>
-        <h3 mat-subheader>Folders</h3>
-        <mat-list-item *ngFor="let call of calls">
-          <mat-icon mat-list-icon>folder</mat-icon>
-          <h4 mat-line>{{call.target}}</h4>
-          <p mat-line> {{call.duration | date}} </p>
-        </mat-list-item>
-        <mat-divider></mat-divider>
-        <h3 mat-subheader>Notes</h3>
-        <mat-list-item *ngFor="let note of notes">
-          <mat-icon mat-list-icon>note</mat-icon>
-          <h4 mat-line>{{note.name}}</h4>
-          <p mat-line> {{note.updated | date}} </p>
-        </mat-list-item>
+  <ng-template ngFor [ngForOf]="callsPool.calls | async" let-call>
+
+    <mat-list-item *ngIf="(call.status | async) as status">
+      <mat-icon mat-list-icon class="status">{{ call.icon }}</mat-icon>
+      <h4 mat-line>
+        <ng-template></ng-template>
+        {{ call.target }}
+        <mat-icon class="direction" *ngIf="call.direction === 'IN'">arrow_back</mat-icon>
+        <mat-icon class="direction" *ngIf="call.direction === 'OUT'">arrow_forward</mat-icon>
+      </h4>
+      <p *ngIf="status.type === 'active'" mat-line class="direction">
+        <span *ngIf="(call.liveDuration | async) as duration">{{ duration | date:'HH:mm:ss':'utc' }}</span>
+      </p>
+      <p *ngIf="status.type === 'done'" mat-line>
+        <span>{{ call.duration | date: 'HH:mm:ss': 'utc' }}</span>
+      </p>
+
+
+      <div *ngIf="call.living; else deadCall">
+        <button *ngIf="call.direction === 'IN' && status.type === 'ringing'" mat-mini-fab color="primary" (click)="call.answer()">
+          <mat-icon aria-label="answer">call</mat-icon>
+        </button>
+        <button *ngIf="status.type === 'active' || status.type === 'ringing'" mat-mini-fab color="warn" (click)="call.hangup()">
+          <mat-icon aria-label="hangup">call_end</mat-icon>
+        </button>
+        <ng-template *ngIf="status.type === 'active'">
+          <button *ngIf="status.type === 'hold'" mat-mini-fab color="warn" (click)="call.unhold()">
+            <mat-icon aria-label="hangup">call</mat-icon>
+          </button>
+          <button *ngIf="status.type !== 'hold'" mat-mini-fab color="warn" (click)="call.hold()">
+            <mat-icon aria-label="hangup">call_pause</mat-icon>
+          </button>
+          <button *ngIf="status.type === 'active' || status.type === 'ringing'" mat-mini-fab color="warn" (click)="call.hangup()">
+            <mat-icon aria-label="hangup">call_end</mat-icon>
+          </button>
+        </ng-template>
+      </div>
+      <ng-template #deadCall>
+        <button mat-mini-fab (click)="UA.call(call.target)">
+            <mat-icon>call_in_talk</mat-icon>
+        </button>
+      </ng-template>
+
+    </mat-list-item>
+
+  </ng-template>
 </mat-list>

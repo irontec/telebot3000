@@ -21,8 +21,10 @@ export interface UAStatus {
 }
 
 export type originator = 'remote' | 'local';
+export type CallType = 'ringing' | 'active' | 'done' | 'missed';
+export type CallIntalkSubtype = '' | 'talking' | 'hold';
+export type CallDirection = 'IN' | 'OUT';
 
-export type sessionStatus = 'ringing' | 'active' | 'paused' | 'finished';
 
 export interface UAconnectingData {
     socket: any;
@@ -63,7 +65,6 @@ export interface UAnewRTCSessionData {
     session: JSSipSession;
     request: any; // JsSIP.IncomingRequest // OutGoingRequest
 }
-
 
 export interface UAnewMessageData {
     originator: originator;
