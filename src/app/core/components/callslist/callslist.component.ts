@@ -1,10 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-// import * as call from './../../../app-jssip/utils';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 import { CallspollService } from './../../../app-jssip/services/callspoll.service';
-import { Call } from './../../../app-jssip/services/ua.service/call';
 import { UaService } from './../../../app-jssip/services/ua.service';
+import { CallComponent } from './../call/call.component';
 
 @Component({
     selector: 'app-callslist',
@@ -15,7 +14,8 @@ export class CallslistComponent implements OnInit, OnDestroy {
 
     constructor(
         private callsPool: CallspollService,
-        private UA: UaService
+        private UA: UaService,
+        public dialog: MatDialog
     ) { }
 
     ngOnInit() {
@@ -26,6 +26,13 @@ export class CallslistComponent implements OnInit, OnDestroy {
 
     }
 
+    openCall(call): void {
 
+        const dialogRef = this.dialog.open(CallComponent, {
+            width: '95%',
+            data: { call }
+        });
+
+    }
 
 }

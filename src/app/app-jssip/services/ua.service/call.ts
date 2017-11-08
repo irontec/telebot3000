@@ -90,7 +90,6 @@ export class Call {
                 }
 
                 if (type === 'done') {
-                    console.log("DYing!!");
                     this.living = false;
                 }
 

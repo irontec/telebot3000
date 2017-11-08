@@ -13,22 +13,27 @@ import { AppJssipModule } from './app-jssip/app-jssip.module';
 import { PhoneComponent } from './core/components/phone/phone.component';
 import { CallslistComponent } from './core/components/callslist/callslist.component';
 import { ConfigComponent } from './core/components/config/config.component';
+import { CallComponent } from './core/components/call/call.component';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    PhoneComponent,
-    CallslistComponent,
-    ConfigComponent
-  ],
-  imports: [
-    BrowserModule,
-    ReactiveFormsModule,
-    AppMaterialModule,
-    AppRoutingModule,
-    AppJssipModule
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
+    declarations: [
+        AppComponent,
+        PhoneComponent,
+        CallslistComponent,
+        ConfigComponent,
+        CallComponent
+    ],
+    entryComponents: [
+        CallComponent
+    ],
+    imports: [
+        BrowserModule,
+        ReactiveFormsModule,
+        AppMaterialModule,
+        AppRoutingModule,
+        AppJssipModule
+    ],
+    providers: [],
+    bootstrap: [AppComponent]
 })
 export class AppModule { }
