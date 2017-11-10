@@ -1,0 +1,12 @@
+.call {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  justify-content: space-around;
+  .status {
+    color: #ccc;
+  }
+  .direction {
+    font-size: 0.9em;
+  }
+}
