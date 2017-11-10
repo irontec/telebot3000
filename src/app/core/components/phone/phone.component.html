@@ -4,8 +4,6 @@
             <input matInput placeholder="Who are you gonna call?" [formControl]="targetControl" required (keyup.enter)="callIt(status.connected)">
         </mat-form-field>
     </div>
-
-
     <div class="pad">
         <mat-grid-list cols="3" rowHeight="100px">
             <ng-template ngFor [ngForOf]="buttons" let-button>

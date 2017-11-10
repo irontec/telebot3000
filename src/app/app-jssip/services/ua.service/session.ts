@@ -76,11 +76,6 @@ export class Session {
         this.status.next('ringing');
     }
 
-    onFailed(e) {
-        this.status.next('done');
-        console.log('failed!! wtf????', e);
-    }
-
     onAccepted(e: any) {
 
         console.log('acepted');
@@ -121,6 +116,11 @@ export class Session {
 
     onUnhold() {
         this.inTalkStatus.next('talking');
+    }
+
+    onFailed(e) {
+        this.status.next('done');
+        console.log('failed!! wtf????', e);
     }
 
     onEnded() {

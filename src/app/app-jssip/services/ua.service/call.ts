@@ -4,11 +4,16 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/interval';
 import 'rxjs/add/operator/switchMap';
+
+import 'rxjs/add/operator/share';
 import 'rxjs/operators/takeWhile';
 import 'rxjs/add/observable/combineLatest';
 import { CallType, CallDirection, CallIntalkSubtype } from '../../utils';
 
 import { UAnewRTCSessionData } from './../../utils';
+
+declare type EndcallCallback = (callData: any) => void;
+
 
 /**
  * Angular wrapper for JSSip.session
@@ -18,16 +23,18 @@ export class Call {
     public target: string;
     public direction: CallDirection;
     public id: string;
-
-    private _session: Session;
+    public type: CallType;
+    public inTalkSubtype: CallIntalkSubtype;
     public living = false;
-
-    public status: Observable<any>;
-
-    private type: CallType;
-    private inTalkSubtype: CallIntalkSubtype;
-    public liveDuration: Observable<number>;
     public duration: number;
+
+    public liveDuration: Observable<number>;
+    private _session: Session;
+    public status: Observable<any>;
+    private endingCallback: Function;
+
+
+
 
     constructor() {
 
@@ -69,6 +76,11 @@ export class Call {
         }
     }
 
+
+    registerEndCallback(fn: (data) => void) {
+        this.endingCallback = fn;
+    }
+
     setSession(rtcData: UAnewRTCSessionData) {
 
         this.living = true;
@@ -89,28 +101,47 @@ export class Call {
                     subtype = '';
                 }
 
+                this.type = type;
+                this.inTalkSubtype = subtype;
+
                 if (type === 'done') {
                     this.living = false;
+                    if (this.endingCallback) {
+                        this.endingCallback({
+                            target: this.target,
+                            direction: this.direction,
+                            id: this.id,
+                            type: this.type,
+                            inTalkSubtype: this.inTalkSubtype,
+                            duration: this.duration
+                        });
+                    }
                 }
-
-                this.type = type;
-
-                this.inTalkSubtype = subtype;
                 return { type, subtype };
             }
-        ).do(c => console.log('new call status', c));
+        );
 
         this.duration = 0;
         this.liveDuration = Observable.interval(1000)
-                            .switchMap(c => Observable.of( (c * 1000) + 1 ) // milliseconds, so we void 0 == false on *ngIf
-                            .do( duration => this.duration = duration);
+                                .switchMap(c => {
+                                    this.duration++;
+                                    return Observable.of( ((this.duration * 1000) + 1) ); // milliseconds, so we void 0 == false on *ngIf
+                                }).publishReplay(1).refCount();
+
 
     }
 
     hydrate(raw) {
+        this.id = raw.id;
+        this.direction = raw.direction;
+        this.duration = raw.duration;
         this.type = raw.type;
         this.inTalkSubtype = raw.subtype || null;
         this.target = raw.target;
+        this.status = Observable.of({
+            type: this.type,
+            subtype: this.inTalkSubtype
+        });
     }
 
     get icon() {

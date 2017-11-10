@@ -68,8 +68,8 @@ export class UaService {
         this.audioElement = node;
     }
 
-    call(target) {
-        const st = this.GenerateStream();
+    async call(target) {
+        const st = await this.GenerateStream();
         this.ngZone.run(() => {
             this.ua.call(target, {
                 'mediaStream': st,
@@ -84,19 +84,31 @@ export class UaService {
         });
     }
 
-    GenerateStream() {
+    async GenerateStream() {
+        const micStream = await navigator.mediaDevices.getUserMedia({audio: true});
+
         const audioCtx = <any>new AudioContext();
+
         const target = audioCtx.createMediaStreamDestination();
 
 
+
+        const mediaStream = audioCtx.createMediaStreamSource(micStream);
+        mediaStream.connect(target);
 
         const el = <HTMLAudioElement>document.getElementById('lew');
         const source = audioCtx.createMediaElementSource(el);
         source.connect(target);
         el.play();
-/*        setTimeout(() => {
-            el.pause();
-        }, 15000);*/
+        let par = 0;
+        setTimeout(() => {
+            console.log("NO LEWOSKY!");
+            par++;
+
+                el.pause();
+                source.disconnect(target);
+
+        }, 25000);
 
         /*setTimeout(() => {
             el.src = 'assets/desconocido.mp3';

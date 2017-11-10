@@ -17,7 +17,7 @@ export class PhoneComponent implements OnInit {
 
     buttons = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'];
     public targetControl = new FormControl('', [Validators.pattern('^[0-9#*]*$')]);
-
+    id = "hola que hase";
     constructor(
         private renderer: Renderer,
         private UA: UaService

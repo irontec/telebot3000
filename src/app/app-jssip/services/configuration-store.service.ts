@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { ConfigurationService } from './configuration.service';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/fromPromise';
+import 'rxjs/add/observable/merge';
 
-import * as localforage from 'localforage';
+import { LocalStorageService } from './../../app-storage/services/localstorage.service';
+
+
 
 @Injectable()
 export class ConfigurationStoreService {
@@ -11,43 +13,41 @@ export class ConfigurationStoreService {
     private props = ['wsuri', 'sipuri', 'password', 'autoconnect', 'autosave', 'stuns'];
 
     constructor(
-        private configuration: ConfigurationService
+        private configuration: ConfigurationService,
+        private localstorage: LocalStorageService
     ) {
 
-        localforage.config({
-            driver: localforage.LOCALSTORAGE,
-            name: 'telecom3000',
-            version: 1.0,
-            storeName: 'configuration'
-        });
     }
 
     saveConfiguration(): Observable<boolean> {
-        return Observable.fromPromise(
-            Promise.all(
-                this.props.map(async (prop) => {
-                    return localforage.setItem(prop, this.configuration[prop]);
-                })
-            )
+        return Observable.merge(
+            ...this.props.map((prop) => {
+                return this.localstorage.setItem(prop, this.configuration[prop]);
+            })
         ).map(e => true);
     }
 
 
     applyConfiguration(): Observable<boolean> {
-        return Observable.fromPromise(
-            Promise.all(
-                this.props.map(async (prop) => {
-                    const value = await localforage.getItem(prop);
-                    if (value != null) {
-                        this.configuration[prop] = value;
-                    }
-                })
-            )
+        return Observable.merge(
+            ...this.props.map((prop) => {
+                return this.localstorage
+                        .getItem(prop)
+                        .do(value => {
+                            if (value != null) {
+                                this.configuration[prop] = value;
+                            }
+                        });
+            })
         ).map(e => true);
     }
 
     clear() {
-        localforage.clear();
+        return Observable.merge(
+            ...this.props.map((prop) => {
+                return this.localstorage.removeItem(prop);
+            })
+        ).map(e => true);
     }
 
 }

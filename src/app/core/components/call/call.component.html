@@ -1,3 +1,11 @@
-<p>
-  call works!
-</p>
+<div *ngIf="(call | async) as currentCall; else nocall">
+
+  <h2>{{ currentCall.target }}</h2>
+  <span *ngIf="(currentCall.liveDuration | async) as duration">{{ duration | date:'HH:mm:ss':'utc' }}</span>
+</div>
+
+
+<ng-template #nocall>
+    No call
+
+</ng-template>
