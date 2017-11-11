@@ -10,7 +10,7 @@ import { LocalStorageService } from './../../app-storage/services/localstorage.s
 @Injectable()
 export class ConfigurationStoreService {
 
-    private props = ['wsuri', 'sipuri', 'password', 'autoconnect', 'autosave', 'stuns'];
+    private props = ['wsuri', 'sipuri', 'password', 'autoconnect', 'autosave', 'stuns', 'azurekeys'];
 
     constructor(
         private configuration: ConfigurationService,

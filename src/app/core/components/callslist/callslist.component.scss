@@ -1,16 +1,8 @@
 mat-list {
+    display:block;
+    overflow-y: auto;
+
     mat-list-item {
-        display:flex;
-        align-items: center;
-        flex-direction: row;
-        justify-content: space-around;
+        width:100%;
     }
-}
-
-.status {
-    color: #ccc;
-}
-
-.direction {
-    font-size:0.9em;
 }

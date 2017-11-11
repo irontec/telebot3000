@@ -4,7 +4,7 @@ import { CallBriefComponent } from './call-brief.component';
 
 describe('CalldetailsComponent', () => {
   let component: CallBriefComponent;
-  let fixture: ComponentFixture<CalldetailsComponent>;
+  let fixture: ComponentFixture<CallBriefComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({

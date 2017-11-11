@@ -12,8 +12,8 @@ import { CallComponent } from './../call/call.component';
 export class CallslistComponent implements OnInit, OnDestroy {
 
     constructor(
-        private callsPool: CallspollService,
-        private UA: UaService,
+        public callsPool: CallspollService,
+        public UA: UaService,
     ) { }
 
     ngOnInit() {

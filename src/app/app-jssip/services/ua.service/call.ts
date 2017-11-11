@@ -34,8 +34,6 @@ export class Call {
     private endingCallback: Function;
 
 
-
-
     constructor() {
 
     }
@@ -76,6 +74,14 @@ export class Call {
         }
     }
 
+    sendDTMF(d: string, event: PointerEvent =  null) {
+
+        if (event && event.stopPropagation) {
+            event.stopPropagation();
+        }
+        this._session.sendDTMF(d);
+    }
+
 
     registerEndCallback(fn: (data) => void) {
         this.endingCallback = fn;
@@ -113,7 +119,7 @@ export class Call {
                             id: this.id,
                             type: this.type,
                             inTalkSubtype: this.inTalkSubtype,
-                            duration: this.duration
+                            duration: this.duration * 1000
                         });
                     }
                 }
@@ -123,12 +129,21 @@ export class Call {
 
         this.duration = 0;
         this.liveDuration = Observable.interval(1000)
+                                .takeWhile(() => this.living)
                                 .switchMap(c => {
                                     this.duration++;
                                     return Observable.of( ((this.duration * 1000) + 1) ); // milliseconds, so we void 0 == false on *ngIf
                                 }).publishReplay(1).refCount();
 
 
+    }
+
+    playBlob(blob: Blob) {
+        this._session.callOptions.playAudioBlob(blob);
+    }
+
+    playBinary(binary: any) {
+        this._session.callOptions.playAudioBinary(binary);
     }
 
     hydrate(raw) {

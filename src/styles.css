@@ -1,28 +1,35 @@
-
 @import '~https://fonts.googleapis.com/icon?family=Material+Icons';
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
-
 body {
-    margin: 7% auto;
-    font-family: Roboto, sans-serif;
-    max-width: 500px;
-    max-height: 800px;
-    height: 800px;
-    border: 0.5px solid #ccc;
-    padding:1em;
-
+  margin: 7% auto;
+  font-family: Roboto, sans-serif;
+  max-width: 500px;
+  max-height: 800px;
+  height: 800px;
+  border: 0.5px solid #ccc;
+  padding: 1em;
 }
 
 mat-card {
-    max-width: 80%;
-    margin: 2em auto;
-    text-align: center;
+  max-width: 80%;
+  margin: 2em auto;
+  text-align: center;
 }
 
 mat-toolbar-row {
-    justify-content: space-between;
+  justify-content: space-between;
 }
 
 .container {
-    margin:2em 0 1em 0;
+  margin: 2em 0 1em 0;
+  max-width: 500px;
+  max-height: 800px;
+  height: 736px;
+  overflow: hidden;
+}
+
+
+.mat-menu-ripple {
+    display: none !important;
+
 }

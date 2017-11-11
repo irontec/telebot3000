@@ -4,8 +4,9 @@ import { CallType, CallDirection, CallIntalkSubtype } from '../../utils';
 
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-
 import 'rxjs/add/observable/of';
+
+import { CallOptions } from './call-options';
 
 /**
  * Angular wrapper for JSSip.session
@@ -13,6 +14,10 @@ import 'rxjs/add/observable/of';
 export class Session {
 
     private _session: JSSipSession;
+
+    public callOptions: CallOptions;
+
+    private answerOptions;
 
     public status = new BehaviorSubject<CallType>('ringing');
     public inTalkStatus = new Subject<CallIntalkSubtype>();
@@ -22,12 +27,21 @@ export class Session {
     private node: HTMLAudioElement;
     private _localStream: JSSIPStream;
 
-    constructor(sessionRaw: JSSipSession, node: HTMLAudioElement) {
+    constructor(sessionRaw: JSSipSession, callOptions: CallOptions, node: HTMLAudioElement) {
         this._session = sessionRaw;
+        this.callOptions = callOptions;
         this.node = node;
         this.inTalkStatus.next(null);
 
         this._wireUpEvents();
+    }
+
+
+    async resolveCallOptions() {
+        if (this.direction === 'IN') {
+            this.answerOptions = await this.callOptions.get();
+        }
+
     }
 
     get direction(): CallDirection {
@@ -49,6 +63,7 @@ export class Session {
     private _wireUpEvents() {
         this._session
             .on('connecting', (e) => this.onConnecting())
+            .on('peerconnection', (e) => this.onPeerConection())
             .on('progress', (e) => this.onProgress())
             .on('accepted', (e) => this.onAccepted(e))
             .on('failed', (e) => this.onFailed(e))
@@ -59,25 +74,26 @@ export class Session {
             .on('update', (e) => this.onUpdate());
 
         if (this._session.connection) {
-            this._session.connection.addEventListener('addstream', (e) => this.onStreamAdded(e));
-        } else {
-            console.log("NOT SESSION!");
+            this.onPeerConection();
         }
     }
 
     onConnecting() {
-        console.log('connecting');
+
         if (this._session.connection.getSenders().length > 0) {
             this._localStream = this._session.connection.getSenders()[0];
         }
     }
+    onPeerConection() {
+        this._session.connection.addEventListener('addstream', (e) => this.onStreamAdded(e));
+    }
+
 
     onProgress() {
         this.status.next('ringing');
     }
 
     onAccepted(e: any) {
-
         console.log('acepted');
         this.status.next('active');
         this.inTalkStatus.next('talking');
@@ -99,14 +115,12 @@ export class Session {
     }
 
     onStreamAdded(e) {
-
         this.node.srcObject = e.stream;
 
     }
 
     onDTMF(e) {
-        console.log(e);
-
+        console.log("DTMF", e);
     }
 
     onHold() {
@@ -146,7 +160,7 @@ export class Session {
     }
 
     answer() {
-        this._session.answer();
+        this._session.answer(this.answerOptions);
     }
 
     hold() {
@@ -165,6 +179,10 @@ export class Session {
     unmute() {
         this.muted.next(false);
         this._session.unmute();
+    }
+
+    sendDTMF(d: string) {
+        this._session.sendDTMF(d);
     }
 
 

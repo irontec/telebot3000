@@ -22,7 +22,7 @@ export class ConfigComponent implements OnInit, OnDestroy {
 
     constructor(
         private fb: FormBuilder,
-        private UA: UaService,
+        public UA: UaService,
         private configuration: ConfigurationService,
         private configurationStore: ConfigurationStoreService
     ) {
@@ -37,7 +37,8 @@ export class ConfigComponent implements OnInit, OnDestroy {
             password: this.configuration.password,
             autosave: this.configuration.autosave,
             autoconnect: this.configuration.autoconnect,
-            stuns: this.configuration.stuns
+            stuns: this.configuration.stuns,
+            azurekeys: this.configuration.azurekeys
         });
 
         // Avoid disabling flicking

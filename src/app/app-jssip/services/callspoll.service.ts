@@ -26,7 +26,6 @@ export class CallspollService {
         if (alive) {
             call.registerEndCallback(this.saveCall());
         }
-console.log("adding call", call);
         this._calls.unshift(call);
         this._emit();
     }
@@ -51,7 +50,6 @@ console.log("adding call", call);
                 ).subscribe((c) => {
                     const call = new Call();
                     call.hydrate(c);
-                    console.log(call);
                     this.addCall(call, false);
                 });
     }

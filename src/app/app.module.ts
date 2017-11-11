@@ -2,7 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
-
+import {HttpClientModule} from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 
@@ -14,6 +14,7 @@ import { PhoneComponent } from './core/components/phone/phone.component';
 import { CallslistComponent } from './core/components/callslist/callslist.component';
 import { ConfigComponent } from './core/components/config/config.component';
 import { CallComponent } from './core/components/call/call.component';
+import { CallBriefComponent } from './core/components/call-brief/call-brief.component';
 
 @NgModule({
     declarations: [
@@ -21,7 +22,8 @@ import { CallComponent } from './core/components/call/call.component';
         PhoneComponent,
         CallslistComponent,
         ConfigComponent,
-        CallComponent
+        CallComponent,
+        CallBriefComponent
     ],
     entryComponents: [
         CallComponent
@@ -31,7 +33,8 @@ import { CallComponent } from './core/components/call/call.component';
         ReactiveFormsModule,
         AppMaterialModule,
         AppRoutingModule,
-        AppJssipModule
+        AppJssipModule,
+        HttpClientModule
     ],
     providers: [],
     bootstrap: [AppComponent]

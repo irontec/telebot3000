@@ -31,7 +31,7 @@ export class AppComponent implements OnInit, OnDestroy {
         private configuration: ConfigurationService,
         private configurationStore: ConfigurationStoreService,
         private callsPool: CallspollService,
-        private UA: UaService,
+        public UA: UaService,
         private router: Router
     ) {
     }
@@ -58,8 +58,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
                     const call = new Call();
                     call.setSession(rtcData);
-                    this.callsPool.addCall(call);
 
+                    this.callsPool.addCall(call);
 
                     this.router.navigate(['callslist']);
                 });

@@ -1,3 +1,4 @@
+import { Call } from '../../core/utils';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -10,7 +11,6 @@ import 'rxjs/add/operator/publishReplay';
 
 import { Injectable, NgZone } from '@angular/core';
 import { UA } from 'jssip';
-
 import { ConfigurationService } from './configuration.service';
 import {
     UAEvent,
@@ -28,6 +28,7 @@ import {
     UAnewRTCSessionData
 } from '../utils';
 import { Session } from './ua.service/session';
+import { CallOptions } from './ua.service/call-options';
 
 @Injectable()
 export class UaService {
@@ -36,14 +37,14 @@ export class UaService {
     public status: BehaviorSubject<UAStatus>;
 
     private ua: UA;
-
     private audioElement: HTMLAudioElement;
+
+    private cacheOptions = [];
 
     constructor(
         private config: ConfigurationService,
         private ngZone: NgZone
     ) {
-
         this.notifier = new Subject<UAMessage>();
         this.status = new BehaviorSubject<UAStatus>(this._generateStatus('disconnected'));
 
@@ -69,57 +70,16 @@ export class UaService {
     }
 
     async call(target) {
-        const st = await this.GenerateStream();
-        this.ngZone.run(() => {
-            this.ua.call(target, {
-                'mediaStream': st,
-                'mediaConstraints': { 'audio': true, 'video': false },
-                'pcConfig': { 'iceServers': [ {'urls': ['stun:stun.l.google.com:19302']} ], 'gatheringTimeout': 2000 },
+        const callOptions = new CallOptions(this.config);
+        const opts = await callOptions.get();
 
-                rtcOfferConstraints: {
-                    offerToReceiveAudio: 1,
-                    offerToReceiveVideo: 0
-                }
-            });
-        });
-    }
+        // FIFO cache; we will need these opts later
+        this.cacheOptions.push(callOptions);
 
-    async GenerateStream() {
-        const micStream = await navigator.mediaDevices.getUserMedia({audio: true});
-
-        const audioCtx = <any>new AudioContext();
-
-        const target = audioCtx.createMediaStreamDestination();
-
-
-
-        const mediaStream = audioCtx.createMediaStreamSource(micStream);
-        mediaStream.connect(target);
-
-        const el = <HTMLAudioElement>document.getElementById('lew');
-        const source = audioCtx.createMediaElementSource(el);
-        source.connect(target);
-        el.play();
-        let par = 0;
-        setTimeout(() => {
-            console.log("NO LEWOSKY!");
-            par++;
-
-                el.pause();
-                source.disconnect(target);
-
-        }, 25000);
-
-        /*setTimeout(() => {
-            el.src = 'assets/desconocido.mp3';
-            el.play();
-        }, 18000);*/
-
-
-        return target.stream;
-
+        const session = this.ua.call(target, opts);
 
     }
+
 
     private _wireMessageSubject(): void {
 
@@ -134,7 +94,9 @@ export class UaService {
             'newMessage'
         ].map(event => {
             this.ua.on(event, e =>
-                this.ngZone.run(() => this.notifier.next(this._parseEvent(<UAEvent>event, e)))
+                this.ngZone.run(() =>
+                    this.notifier.next(this._parseEvent(<UAEvent>event, e))
+                )
             );
         });
 
@@ -195,7 +157,16 @@ export class UaService {
             }
             case 'newRTCSession': {
                 payload = this._hydratePayload<UAnewRTCSessionData>(event, ['originator', 'request']);
-                payload['session'] = new Session(event['session'], this.audioElement);
+                let callOptions;
+                if (payload['originator'] === 'local') {
+                    callOptions = this.cacheOptions.shift();
+                } else {
+                    callOptions = new CallOptions(this.config);
+                }
+
+                payload['session'] = new Session(event['session'], callOptions, this.audioElement);
+                payload['session'].resolveCallOptions();
+
                 break;
             }
             case 'newMessage': {

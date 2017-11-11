@@ -11,6 +11,8 @@ export class ConfigurationService {
     public autosave = false;
     private _stuns: string[] = [];
 
+    private _azurekeys: string[] = [];
+
     constructor() {
     }
 
@@ -50,6 +52,17 @@ export class ConfigurationService {
 
     set stuns(stuns) {
         this._stuns = stuns.split('\n').filter(s => s !== '');
+    }
+
+    get azurekeys() {
+        return  this._azurekeys.join('\n');
+    }
+
+    set azurekeys(keys) {
+        // Will return a shuffled array with the keys (use 1 each time)
+        this._azurekeys = keys.split('\n')
+                            .filter(s => s !== '')
+                            .sort(() => Math.random() - 0.5);
     }
 
     getPcConfig() {
