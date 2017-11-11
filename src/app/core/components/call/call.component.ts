@@ -55,15 +55,18 @@ export class CallComponent implements OnInit {
 
 
     speak(text: string) {
+
         const sp = new bingSpeech({
-            apiKey: this.config.azurekeys[0],
+            apiKey: this.config.getRandomAzureKey(),
         });
 
 
         const headers = {
-            "X-Microsoft-OutputFormat": "riff-16khz-16bit-mono-pcm"
+            "X-Microsoft-OutputFormat": "raw-16khz-16bit-mono-pcm"
         };
-
+        //audio-16khz-128kbitrate-mono-mp3
+        //riff-16khz-16bit-mono-pcm
+        //raw-16khz-16bit-mono-pcm
         const body = {
             text: "¿son estos tus deberes larry?",
             language: "es-ES",

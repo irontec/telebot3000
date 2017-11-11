@@ -61,8 +61,11 @@ export class ConfigurationService {
     set azurekeys(keys) {
         // Will return a shuffled array with the keys (use 1 each time)
         this._azurekeys = keys.split('\n')
-                            .filter(s => s !== '')
-                            .sort(() => Math.random() - 0.5);
+                            .filter(s => s !== '');
+    }
+
+    getRandomAzureKey() {
+        return this._azurekeys.sort(() => Math.random() - 0.5)[0];
     }
 
     getPcConfig() {
