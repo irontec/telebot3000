@@ -49,21 +49,18 @@ export class CallOptions {
 
     playAudioBinary(binary: any) {
 
-
-        let i;
-        const len = binary.length, u8_array = new Uint8Array(len);
-        for (i = 0; i < len; i++) {
-            u8_array[i] = binary.charCodeAt(i);
+        const len = binary.length;
+        const bytes = new Uint8Array( len );
+        for (let i = 0; i < len; i++) {
+            bytes[i] = binary.charCodeAt(i);
         }
-        const ab = btoa(binary);
-console.log(ab);
-console.log("bien?")
-        //this.audioCtx.decodeAudioData(ab).then(buffer => {
+
+        this.audioCtx.decodeAudioData(bytes.buffer).then(buffer => {
             const source = this.audioCtx.createBufferSource();
-            source.buffer = ab;
+            source.buffer = buffer;
             source.connect(this.target);
             source.start(0);
-        //}).catch(e => console.log("ERROR", e));
+        }).catch(e => console.log('ERROR decoding audio!', e));
 
     }
 

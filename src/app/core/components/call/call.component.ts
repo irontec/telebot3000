@@ -62,23 +62,20 @@ export class CallComponent implements OnInit {
 
 
         const headers = {
-            "X-Microsoft-OutputFormat": "raw-16khz-16bit-mono-pcm"
+            'X-Microsoft-OutputFormat': 'riff-8khz-8bit-mono-mulaw'
         };
-        //audio-16khz-128kbitrate-mono-mp3
-        //riff-16khz-16bit-mono-pcm
-        //raw-16khz-16bit-mono-pcm
+
         const body = {
-            text: "¿son estos tus deberes larry?",
-            language: "es-ES",
-            voiceName: "Microsoft Server Speech Text to Speech Voice (en-US, ZiraRUS)",
-            gender: "Female"
+            text,
+            language: 'es-ES',
+            voiceName: 'Microsoft Server Speech Text to Speech Voice (es-ES, Laura, Apollo)',
+            gender: 'Female'
         };
 
         sp.getSpeech({
             headers,
             body
         }).then(response => {
-            console.log(response);
             this._call.playBinary(response);
         });
 

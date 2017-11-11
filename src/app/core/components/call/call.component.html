@@ -4,49 +4,74 @@
 
 
 
-  <div class="actions" *ngIf="call.living">
+  <div class="actions">
+    <!--</div> *ngIf="call.living"> -->
 
-    <button mat-icon-button [matMenuTriggerFor]="dtmfMenu">
-        <mat-icon>dialpad</mat-icon>
-      </button>
+    <button mat-icon-button [matMenuTriggerFor]="dtmfMenu" matTooltip="DTMF" matTooltipPosition="below">
+      <mat-icon>dialpad</mat-icon>
+    </button>
+
+    <button mat-icon-button (click)="playSound('assets/hadouken.mp3')">
+      <img class="emotclips" src="assets/hadouken.png" />
+    </button>
+
+    <button mat-icon-button (click)="playSound('assets/chewbacca.mp3')">
+      <img class="emotclips" src="assets/chewbacca.png" />
+    </button>
+
+    <button mat-icon-button (click)="playSound('assets/haha.mp3')">
+      <img class="emotclips" src="assets/haha.png" />
+    </button>
+
+    <button mat-icon-button (click)="playSound('assets/badumtss.mp3')">
+      <img class="emotclips" src="assets/badumtss.png" />
+    </button>
+
+    <button mat-icon-button (click)="playSound('assets/deberes.mp3')">
+      <img class="emotclips" src="assets/walter.png" />
+    </button>
+
+    <button mat-icon-button (click)="playSound('assets/alataque.mp3')">
+      <img class="emotclips" src="assets/chiquito.png" />
+    </button>
+
+  </div>
 
 
-      <button mat-icon-button (click)="playSound('assets/deberes.mp3')">
-        <mat-icon>group_work</mat-icon>
-      </button>
+  <div class="speak">
+    <mat-form-field>
+      <input matInput [(ngModel)]='sentence' placeholder="What do you want to say?" (keyup.enter)="speak(sentence); sentence = '';"
+      />
+    </mat-form-field>
+    <button mat-icon-button (click)="speak(sentence); sentence = '';" matTooltip="speak!" matTooltipPosition="below">
+      <mat-icon>record_voice_over</mat-icon>
+    </button>
+  </div>
 
-      <button mat-icon-button (click)="speak('Hola que tal')">
-        <mat-icon>record_voice_over</mat-icon>
-      </button>
 
 
-
-
+  <mat-menu #dtmfMenu="matMenu" class="dtmfMenu" disableRipple>
+    <div mat-menu-item disableRipple>
+      <button mat-mini-fab color="primary" (click)="call.sendDTMF('1', $event)">1</button>
+      <button mat-mini-fab color="primary" (click)="call.sendDTMF('2', $event)">2</button>
+      <button mat-mini-fab color="primary" (click)="call.sendDTMF('3', $event)">3</button>
     </div>
-
-
-    <mat-menu #dtmfMenu="matMenu" class="dtmfMenu" disableRipple>
-      <div mat-menu-item disableRipple>
-        <button mat-mini-fab color="primary" (click)="call.sendDTMF('1', $event)">1</button>
-        <button mat-mini-fab color="primary" (click)="call.sendDTMF('2', $event)">2</button>
-        <button mat-mini-fab color="primary" (click)="call.sendDTMF('3', $event)">3</button>
-      </div>
-      <div mat-menu-item>
-        <button mat-mini-fab color="primary" (click)="call.sendDTMF('4', $event)">4</button>
-        <button mat-mini-fab color="primary" (click)="call.sendDTMF('5', $event)">5</button>
-        <button mat-mini-fab color="primary" (click)="call.sendDTMF('6', $event)">6</button>
-      </div>
-      <div mat-menu-item>
-        <button mat-mini-fab color="primary" (click)="call.sendDTMF('7', $event)">7</button>
-        <button mat-mini-fab color="primary" (click)="call.sendDTMF('8', $event)">8</button>
-        <button mat-mini-fab color="primary" (click)="call.sendDTMF('9', $event)">9</button>
-      </div>
-      <div mat-menu-item>
-        <button mat-mini-fab color="primary" (click)="call.sendDTMF('*', $event)">*</button>
-        <button mat-mini-fab color="primary" (click)="call.sendDTMF('0', $event)">0</button>
-        <button mat-mini-fab color="primary" (click)="call.sendDTMF('#', $event)">#</button>
-      </div>
-    </mat-menu>
+    <div mat-menu-item>
+      <button mat-mini-fab color="primary" (click)="call.sendDTMF('4', $event)">4</button>
+      <button mat-mini-fab color="primary" (click)="call.sendDTMF('5', $event)">5</button>
+      <button mat-mini-fab color="primary" (click)="call.sendDTMF('6', $event)">6</button>
+    </div>
+    <div mat-menu-item>
+      <button mat-mini-fab color="primary" (click)="call.sendDTMF('7', $event)">7</button>
+      <button mat-mini-fab color="primary" (click)="call.sendDTMF('8', $event)">8</button>
+      <button mat-mini-fab color="primary" (click)="call.sendDTMF('9', $event)">9</button>
+    </div>
+    <div mat-menu-item>
+      <button mat-mini-fab color="primary" (click)="call.sendDTMF('*', $event)">*</button>
+      <button mat-mini-fab color="primary" (click)="call.sendDTMF('0', $event)">0</button>
+      <button mat-mini-fab color="primary" (click)="call.sendDTMF('#', $event)">#</button>
+    </div>
+  </mat-menu>
 
 
 

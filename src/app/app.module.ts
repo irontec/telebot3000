@@ -1,8 +1,8 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { ReactiveFormsModule } from '@angular/forms';
-import {HttpClientModule} from '@angular/common/http';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 
@@ -30,6 +30,7 @@ import { CallBriefComponent } from './core/components/call-brief/call-brief.comp
     ],
     imports: [
         BrowserModule,
+        FormsModule,
         ReactiveFormsModule,
         AppMaterialModule,
         AppRoutingModule,
