@@ -42,7 +42,7 @@
     </mat-expansion-panel>
 
     <div class="button-row">
-        <button *ngIf="!status.connected" mat-raised-button color="primary" (click)="UA.connect()">Connect</button>
-        <button *ngIf="status.connected" mat-raised-button color="accent" (click)="UA.disconnect()">Disconnect</button>
+        <button class="connect" *ngIf="!status.connected" mat-raised-button color="primary" (click)="UA.connect()">Connect</button>
+        <button class="disconnect" *ngIf="status.connected" mat-raised-button color="accent" (click)="UA.disconnect()">Disconnect</button>
     </div>
 </form>

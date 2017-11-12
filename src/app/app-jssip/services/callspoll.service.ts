@@ -43,6 +43,7 @@ export class CallspollService {
     private _loadDeadCalls() {
         this.localstorage
                 .getItem('CALLS_INDEX')
+                .map(calls => !calls ? [] : calls)
                 .switchMap((callIndex: string[]) =>
                         Observable.merge(
                             ...callIndex.map(id => this.localstorage.getItem(`C_${id}`))

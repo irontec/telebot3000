@@ -1,10 +1,8 @@
 <mat-list class="container">
     <ng-template ngFor [ngForOf]="callsPool.calls | async" let-call>
 
-        <mat-list-item>
-
+        <mat-list-item class="callItem">
             <app-call-brief [call]="call" source="list"></app-call-brief>
-
         </mat-list-item>
 
     </ng-template>

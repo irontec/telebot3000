@@ -68,32 +68,26 @@
 
   <mat-menu #dtmfMenu="matMenu" class="dtmfMenu">
     <div mat-menu-item disableRipple>
-      <button mat-mini-fab color="primary" (click)="call.sendDTMF('1', $event);">1</button>
-      <button mat-mini-fab color="primary" (click)="call.sendDTMF('2', $event);">2</button>
-      <button mat-mini-fab color="primary" (click)="call.sendDTMF('3', $event);">3</button>
+      <button value="1" mat-mini-fab color="primary" (click)="call.sendDTMF('1', $event);">1</button>
+      <button value="2" mat-mini-fab color="primary" (click)="call.sendDTMF('2', $event);">2</button>
+      <button value="3" mat-mini-fab color="primary" (click)="call.sendDTMF('3', $event);">3</button>
     </div>
     <div mat-menu-item>
-      <button mat-mini-fab color="primary" (click)="call.sendDTMF('4', $event);">4</button>
-      <button mat-mini-fab color="primary" (click)="call.sendDTMF('5', $event);">5</button>
-      <button mat-mini-fab color="primary" (click)="call.sendDTMF('6', $event);">6</button>
+      <button value="4" mat-mini-fab color="primary" (click)="call.sendDTMF('4', $event);">4</button>
+      <button value="5" mat-mini-fab color="primary" (click)="call.sendDTMF('5', $event);">5</button>
+      <button value="6" mat-mini-fab color="primary" (click)="call.sendDTMF('6', $event);">6</button>
     </div>
     <div mat-menu-item>
-      <button mat-mini-fab color="primary" (click)="call.sendDTMF('7', $event);">7</button>
-      <button mat-mini-fab color="primary" (click)="call.sendDTMF('8', $event);">8</button>
-      <button mat-mini-fab color="primary" (click)="call.sendDTMF('9', $event);">9</button>
+      <button value="7" mat-mini-fab color="primary" (click)="call.sendDTMF('7', $event);">7</button>
+      <button value="8" mat-mini-fab color="primary" (click)="call.sendDTMF('8', $event);">8</button>
+      <button value="9" mat-mini-fab color="primary" (click)="call.sendDTMF('9', $event);">9</button>
     </div>
     <div mat-menu-item>
-      <button mat-mini-fab color="primary" (click)="call.sendDTMF('*', $event);">*</button>
-      <button mat-mini-fab color="primary" (click)="call.sendDTMF('0', $event);">0</button>
-      <button mat-mini-fab color="primary" (click)="call.sendDTMF('#', $event);">#</button>
+      <button value="*" mat-mini-fab color="primary" (click)="call.sendDTMF('*', $event);">*</button>
+      <button value="0" mat-mini-fab color="primary" (click)="call.sendDTMF('0', $event);">0</button>
+      <button value="#" mat-mini-fab color="primary" (click)="call.sendDTMF('#', $event);">#</button>
     </div>
   </mat-menu>
-
-
-
-
-
-
 
 </div>
 

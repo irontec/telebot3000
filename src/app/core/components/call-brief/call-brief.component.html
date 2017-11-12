@@ -1,6 +1,7 @@
 <div *ngIf="(call.status | async) as status" class="call">
-  <mat-icon mat-list-icon class="status">{{ call.icon }}</mat-icon>
-  <h4 mat-line>
+
+  <mat-icon mat-list-icon class="statusIcon">{{ call.icon }}</mat-icon>
+  <h4 mat-line class="ddi">
     {{ call.target }}
     <mat-icon class="direction" *ngIf="call.direction === 'IN'">arrow_back</mat-icon>
     <mat-icon class="direction" *ngIf="call.direction === 'OUT'">arrow_forward</mat-icon>
@@ -31,7 +32,7 @@
     <button *ngIf="status.type === 'active' && status.subtype !== 'hold'" mat-mini-fab color="basic" (click)="call.hold()">
       <mat-icon>phone_paused</mat-icon>
     </button>
-    <button *ngIf="source === 'list' && status.type === 'active'" mat-mini-fab [routerLink]="['/call', call.id]">
+    <button class="call-details" *ngIf="source === 'list' && status.type === 'active'" mat-mini-fab [routerLink]="['/call', call.id]">
       <mat-icon>add</mat-icon>
     </button>
     <button *ngIf="source === 'call'" mat-mini-fab [routerLink]="['/callslist']">

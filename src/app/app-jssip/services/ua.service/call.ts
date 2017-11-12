@@ -206,16 +206,14 @@ export class Call {
         }
 
         if (type === 'active') {
-            if (this.inTalkSubtype === 'talking') {
-                return 'phone_in_talk';
-            }
 
             if (this.inTalkSubtype === 'hold') {
                 return 'phone_paused';
             }
+            return 'phone_in_talk';
         }
 
-        return 'phone';
+        return 'call_end';
     }
 
 }

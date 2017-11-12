@@ -1,7 +1,7 @@
 <div *ngIf="(UA.status | async) as status">
     <mat-toolbar color="primary">
         <span>
-            <mat-icon *ngIf="status.connected && status.status === 'registered'; else disconnectedIcon">mood</mat-icon>
+            <mat-icon class="ok" *ngIf="status.connected && status.status === 'registered'; else disconnectedIcon">mood</mat-icon>
             <ng-template #disconnectedIcon>
                 <mat-icon class="error">mood_bad</mat-icon>
             </ng-template>
@@ -18,12 +18,12 @@
         </button>
     </mat-toolbar>
 
-    <mat-menu x-position="before" #menu="matMenu">
-        <button mat-menu-item routerLink="/phone">
+    <mat-menu x-position="before" #menu="matMenu" class="navigationMenu">
+        <button mat-menu-item routerLink="phone">
             <mat-icon>dialpad</mat-icon>Phone</button>
-        <button mat-menu-item routerLink="/callslist">
+        <button mat-menu-item routerLink="callslist">
             <mat-icon>format_list_bulleted</mat-icon>Calls List</button>
-        <button mat-menu-item routerLink="/config">
+        <button mat-menu-item routerLink="config">
             <mat-icon>build</mat-icon>Config</button>
     </mat-menu>
 
