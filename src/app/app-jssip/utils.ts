@@ -81,5 +81,9 @@ export interface UAMessage {
 }
 
 
+export interface DTMFSignal {
+    originator: originator;
+    code: string;
 
+}
 

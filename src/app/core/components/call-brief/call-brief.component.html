@@ -31,14 +31,20 @@
     <button *ngIf="status.type === 'active' && status.subtype !== 'hold'" mat-mini-fab color="basic" (click)="call.hold()">
       <mat-icon>phone_paused</mat-icon>
     </button>
-    <button *ngIf="status.type === 'active'" mat-mini-fab [routerLink]="['/call', call.id]">
+    <button *ngIf="source === 'list' && status.type === 'active'" mat-mini-fab [routerLink]="['/call', call.id]">
       <mat-icon>add</mat-icon>
+    </button>
+    <button *ngIf="source === 'call'" mat-mini-fab [routerLink]="['/callslist']">
+        <mat-icon>remove</mat-icon>
     </button>
 
   </div>
   <ng-template #deadCall>
     <button mat-mini-fab (click)="UA.call(call.target)">
       <mat-icon>call_in_talk</mat-icon>
+    </button>
+    <button *ngIf="source === 'call'" mat-mini-fab [routerLink]="['/callslist']">
+        <mat-icon>remove</mat-icon>
     </button>
   </ng-template>
 </div>

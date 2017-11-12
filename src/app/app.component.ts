@@ -45,9 +45,7 @@ export class AppComponent implements OnInit, OnDestroy {
             }
         });
 
-        this.UA.registerAudioNode(this.audioElement.nativeElement);
         this.connectionStatus = this._generateConnectionStatusFeed();
-
 
         // Manage incoming/outgoing calls
         this.UA.notifier
@@ -71,9 +69,8 @@ export class AppComponent implements OnInit, OnDestroy {
         return this.UA.notifier
 
             .filter(
-            (message: UAMessage) => ['registered', 'disconnected'].indexOf(message.event) !== -1
+               (message: UAMessage) => ['registered', 'disconnected'].indexOf(message.event) !== -1
             )
-
             .map((message: UAMessage) => {
 
                 const status: ConnectionStatus = {

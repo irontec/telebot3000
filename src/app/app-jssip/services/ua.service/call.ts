@@ -29,10 +29,12 @@ export class Call {
     public duration: number;
 
     public liveDuration: Observable<number>;
+    public incomingDTMF: Observable<string>;
+    public outgoingDTMF: Observable<string>;
     private _session: Session;
     public status: Observable<any>;
-    private endingCallback: Function;
-
+    private endingCallback: (data) => void;
+    private _incomingStreamCallBack: (data) => void;
 
     constructor() {
 
@@ -93,6 +95,13 @@ export class Call {
 
         this._session = rtcData.session;
 
+
+        if (this._incomingStreamCallBack) {
+            this._session.registerIncomingStreamCallback(this._incomingStreamCallBack);
+            this._incomingStreamCallBack = null;
+        }
+
+
         this.target = this._session.target;
         this.direction = this._session.direction;
         this.id = this._session.id;
@@ -132,18 +141,40 @@ export class Call {
                                 .takeWhile(() => this.living)
                                 .switchMap(c => {
                                     this.duration++;
-                                    return Observable.of( ((this.duration * 1000) + 1) ); // milliseconds, so we void 0 == false on *ngIf
-                                }).publishReplay(1).refCount();
+                                    const value = (this.duration * 1000) +1;
+                                    return Observable.of(value); // milliseconds, so we void 0 == false on *ngIf
+                                })
+                                .publishReplay(1)
+                                .refCount();
 
+        const dtmfFeed = this._session.dtmf.asObservable().share();
+
+        this.incomingDTMF = dtmfFeed
+                                .filter(d => d.originator === 'remote')
+                                .map(d => d.code)
+                                .scan((current, code) => `${current} ${code}`, '');
+
+        this.outgoingDTMF = dtmfFeed
+                                .filter(d => d.originator === 'local')
+                                .map(d => d.code)
+                                .scan((current, code) => `${current} ${code}`, '');
 
     }
 
-    playBlob(blob: Blob) {
-        this._session.callOptions.playAudioBlob(blob);
+    sendBlob(blob: Blob) {
+        this._session.callOptions.sendAudioBlob(blob);
     }
 
-    playBinary(binary: any) {
-        this._session.callOptions.playAudioBinary(binary);
+    sendBinary(binary: any) {
+        this._session.callOptions.sendAudioBinary(binary);
+    }
+
+    registerIncomingStreamCallback(fn: (data) => void) {
+        if (this._session) {
+            this._session.registerIncomingStreamCallback(fn);
+        } else {
+            this._incomingStreamCallBack = fn;
+        }
     }
 
     hydrate(raw) {

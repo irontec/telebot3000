@@ -51,7 +51,7 @@ export class CallOptions {
         return this.target;
     }
 
-    playAudioBinary(binary: any) {
+    sendAudioBinary(binary: any) {
 
         const len = binary.length;
         const bytes = new Uint8Array( len );
@@ -68,7 +68,7 @@ export class CallOptions {
 
     }
 
-    playAudioBlob(blob: Blob) {
+    sendAudioBlob(blob: Blob) {
 
         const audio0 = new Audio(window.URL.createObjectURL(blob));
 

@@ -10,6 +10,7 @@ import { Call } from './../../../app-jssip/services/ua.service/call';
 })
 export class CallBriefComponent implements OnInit {
     @Input() call: Call;
+    @Input() source: string;
     constructor(
         private UA: UaService,
     ) { }

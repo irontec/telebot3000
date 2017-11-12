@@ -1,5 +1,10 @@
+
 div.actions {
     text-align: center;
+    width:85%;
+    border:1px solid #dedede;
+    margin: 2em auto;
+    padding: 0.5em;
 }
 
 
@@ -8,10 +13,10 @@ img.emotclips {
     height: 32px;
 }
 
-div.speak {
-    margin: 1em 0;
+div.speaking {
     text-align: center;
     .mat-form-field {
-        width:320px;
+        margin:1em;
+        width:75%;
     }
 }

@@ -1,6 +1,6 @@
 import { session as JSSipSession, Utils as JSSIPUtils, stream as JSSIPStream } from 'jssip';
 
-import { CallType, CallDirection, CallIntalkSubtype } from '../../utils';
+import { CallType, CallDirection, CallIntalkSubtype, DTMFSignal } from '../../utils';
 
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -18,19 +18,20 @@ export class Session {
     public callOptions: CallOptions;
 
     private answerOptions;
-
+    private streamAddedCallback: (data) => void;
     public status = new BehaviorSubject<CallType>('ringing');
+
     public inTalkStatus = new Subject<CallIntalkSubtype>();
-
     public muted = new Subject<boolean>();
+    public dtmf = new Subject<DTMFSignal>();
 
-    private node: HTMLAudioElement;
+    private _incomingStream: any;
+
     private _localStream: JSSIPStream;
 
-    constructor(sessionRaw: JSSipSession, callOptions: CallOptions, node: HTMLAudioElement) {
+    constructor(sessionRaw: JSSipSession, callOptions: CallOptions) {
         this._session = sessionRaw;
         this.callOptions = callOptions;
-        this.node = node;
         this.inTalkStatus.next(null);
 
         this._wireUpEvents();
@@ -115,12 +116,22 @@ export class Session {
     }
 
     onStreamAdded(e) {
-        this.node.srcObject = e.stream;
+        if (this.streamAddedCallback) {
+            this.streamAddedCallback(e.stream);
+        } else {
+            this._incomingStream = e.stream;
+        }
+    }
 
+    getIncomingStream() {
+        return this._incomingStream;
     }
 
     onDTMF(e) {
-        console.log("DTMF", e);
+        this.dtmf.next({
+            originator: e.originator,
+            code: `${e.dtmf.tone}`,
+        });
     }
 
     onHold() {
@@ -185,7 +196,13 @@ export class Session {
         this._session.sendDTMF(d);
     }
 
-
+    registerIncomingStreamCallback(fn: (data) => void) {
+        if (this._incomingStream) {
+            fn(this._incomingStream);
+        } else {
+            this.streamAddedCallback = fn;
+        }
+    }
 }
 
 

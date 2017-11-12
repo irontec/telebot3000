@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CallspollService } from './../../../app-jssip/services/callspoll.service';
 import { Call } from './../../../app-jssip/services/ua.service/call';
 import { ConfigurationService } from './../../../app-jssip/services/configuration.service';
@@ -15,46 +15,43 @@ import { bingSpeech } from 'cognitive-services';
 })
 export class CallComponent implements OnInit {
 
+
     public currentCall: Observable<Call>;
-    private _call: Call;
 
     constructor(
         private config: ConfigurationService,
         private http: HttpClient,
         private callsPool: CallspollService,
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        private router: Router
     ) { }
 
     ngOnInit() {
         this.currentCall = this.route.params
             .switchMap(params => {
-                console.log(params);
-                if (!params['id']) {
-                    return empty();
-                }
 
-                const call = this.callsPool.getCallById(params['id']);
-                if (!call) {
-                    return empty();
+                if (params['id']) {
+                    const call = this.callsPool.getCallById(params['id']);
+                    if (call && call.living) {
+
+                        call.registerIncomingStreamCallback((stream) => this.wireUpStream(stream));
+                        return Observable.of(call);
+                    }
                 }
-                this._call = call;
-                return Observable.of(call);
+                this.router.navigate(['callslist']);
+                return empty();
             });
 
     }
 
-    playSound(path) {
+    sendSound(call, path) {
         return this.http.get(path, {
             responseType: 'blob'
-        }).subscribe(data => {
-
-            console.log(data);
-            this._call.playBlob(data);
-        });
+        }).subscribe(data => call.sendBlob(data));
     }
 
 
-    speak(text: string) {
+    speak(call, text: string) {
 
         const sp = new bingSpeech({
             apiKey: this.config.getRandomAzureKey(),
@@ -75,10 +72,14 @@ export class CallComponent implements OnInit {
         sp.getSpeech({
             headers,
             body
-        }).then(response => {
-            this._call.playBinary(response);
-        });
+        }).then(response => call.sendBinary(response));
 
+    }
+
+    private wireUpStream(stream: any) {
+        const audio = new Audio();
+        audio.autoplay = true;
+        audio.srcObject = stream;
     }
 
 }

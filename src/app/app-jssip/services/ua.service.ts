@@ -37,7 +37,6 @@ export class UaService {
     public status: BehaviorSubject<UAStatus>;
 
     private ua: UA;
-    private audioElement: HTMLAudioElement;
 
     private cacheOptions = [];
 
@@ -65,9 +64,6 @@ export class UaService {
         this.ua.stop();
     }
 
-    registerAudioNode(node: HTMLAudioElement) {
-        this.audioElement = node;
-    }
 
     async call(target) {
         const callOptions = new CallOptions(this.config);
@@ -164,7 +160,7 @@ export class UaService {
                     callOptions = new CallOptions(this.config);
                 }
 
-                payload['session'] = new Session(event['session'], callOptions, this.audioElement);
+                payload['session'] = new Session(event['session'], callOptions);
                 payload['session'].resolveCallOptions();
 
                 break;
