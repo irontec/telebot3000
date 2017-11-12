@@ -21,6 +21,14 @@
 
 
   <div class="actions speaking">
+    <div>
+            <button mat-icon-button (click)="call.toggleMic()">
+                <mat-icon *ngIf="call.micEnabled">mic</mat-icon>
+                <mat-icon *ngIf="!call.micEnabled">mic_off</mat-icon>
+            </button>
+    </div>
+
+
 
     <button mat-icon-button (click)="sendSound(call, 'assets/hadouken.mp3')">
       <img class="emotclips" src="assets/hadouken.png" />
@@ -48,7 +56,8 @@
 
 
     <mat-form-field>
-      <input matInput [(ngModel)]='sentence' placeholder="What do you want to say?" (keyup.enter)="speak(call, sentence); sentence = '';" />
+      <input matInput [(ngModel)]='sentence' placeholder="What do you want to say?" (keyup.enter)="speak(call, sentence); sentence = '';"
+      />
     </mat-form-field>
     <button mat-icon-button (click)="speak(call, sentence); sentence = '';" matTooltip="speak!" matTooltipPosition="below">
       <mat-icon>record_voice_over</mat-icon>

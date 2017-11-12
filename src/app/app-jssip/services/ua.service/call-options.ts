@@ -25,6 +25,9 @@ export class CallOptions {
     audioCtx: any;
     target: any;
 
+    micEnabled = true;
+    micStream: any;
+
     constructor(config: ConfigurationService) {
 
     }
@@ -83,19 +86,31 @@ export class CallOptions {
 
     }
 
+    public toggleMic() {
+        if (this.micEnabled) {
+            this.micEnabled = false;
+            this.micStream.disconnect(this.target);
+        } else {
+            this.micEnabled = true;
+            this.micStream.connect(this.target);
+        }
+    }
+
     private async generateStream() {
 
-        const micStream = await navigator.mediaDevices.getUserMedia({ audio: this.audio, video: this.video });
+        const mic = await navigator.mediaDevices.getUserMedia({ audio: this.audio, video: this.video });
 
         this.audioCtx = <any>new AudioContext();
 
         this.target = this.audioCtx.createMediaStreamDestination();
 
-        const mediaStream = this.audioCtx.createMediaStreamSource(micStream);
-        mediaStream.connect(this.target);
-
+        this.micStream = this.audioCtx.createMediaStreamSource(mic);
+        this.micStream.connect(this.target);
+        this.micEnabled = true;
         return this.target['stream'];
-
     }
+
+
+
 
 }

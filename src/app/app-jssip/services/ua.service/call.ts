@@ -27,7 +27,7 @@ export class Call {
     public inTalkSubtype: CallIntalkSubtype;
     public living = false;
     public duration: number;
-
+    public micEnabled = true;
     public liveDuration: Observable<number>;
     public incomingDTMF: Observable<string>;
     public outgoingDTMF: Observable<string>;
@@ -188,6 +188,11 @@ export class Call {
             type: this.type,
             subtype: this.inTalkSubtype
         });
+    }
+
+    toggleMic() {
+        this.micEnabled = !this.micEnabled;
+        this._session.callOptions.toggleMic();
     }
 
     get icon() {
