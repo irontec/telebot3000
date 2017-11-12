@@ -34,7 +34,11 @@ export class CallOptions {
         return {
             'mediaStream': await this.generateStream(),
             'mediaConstraints': { 'audio': this.audio, 'video': this.video },
-            'pcConfig': { 'iceServers': [{ 'urls': ['stun:stun.l.google.com:19302'] }], 'gatheringTimeout': 2000 },
+            'pcConfig': {
+                'iceServers': [{ 'urls': ['stun:stun.l.google.com:19302'] }],
+                'gatheringTimeout': 2000,
+                rtcpMuxPolicy: 'negotiate'
+            },
             rtcOfferConstraints: {
                 offerToReceiveAudio: this.audio ? 1 : 0,
                 offerToReceiveVideo: this.video ? 1 : 0
