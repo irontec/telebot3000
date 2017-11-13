@@ -31,10 +31,11 @@ export class Call {
     public liveDuration: Observable<number>;
     public incomingDTMF: Observable<string>;
     public outgoingDTMF: Observable<string>;
+
     private _session: Session;
     public status: Observable<any>;
     private endingCallback: (data) => void;
-    private _incomingStreamCallBack: (data) => void;
+
 
     constructor() {
 
@@ -96,12 +97,6 @@ export class Call {
         this._session = rtcData.session;
 
 
-        if (this._incomingStreamCallBack) {
-            this._session.registerIncomingStreamCallback(this._incomingStreamCallBack);
-            this._incomingStreamCallBack = null;
-        }
-
-
         this.target = this._session.target;
         this.direction = this._session.direction;
         this.id = this._session.id;
@@ -159,22 +154,12 @@ export class Call {
                                 .map(d => d.code)
                                 .scan((current, code) => `${current} ${code}`, '');
 
+
     }
 
-    sendBlob(blob: Blob) {
-        this._session.callOptions.sendAudioBlob(blob);
-    }
 
-    sendBinary(binary: any) {
-        this._session.callOptions.sendAudioBinary(binary);
-    }
-
-    registerIncomingStreamCallback(fn: (data) => void) {
-        if (this._session) {
-            this._session.registerIncomingStreamCallback(fn);
-        } else {
-            this._incomingStreamCallBack = fn;
-        }
+    getCallOptions() {
+        return this._session.callOptions;
     }
 
     hydrate(raw) {

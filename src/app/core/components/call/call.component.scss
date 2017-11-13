@@ -13,10 +13,12 @@ img.emotclips {
     height: 32px;
 }
 
-div.speaking {
+div.speaking, div.lsitening  {
     text-align: center;
     .mat-form-field {
         margin:1em;
         width:75%;
     }
+
+
 }

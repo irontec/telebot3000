@@ -18,14 +18,15 @@ export class Session {
     public callOptions: CallOptions;
 
     private answerOptions;
-    private streamAddedCallback: (data) => void;
+
     public status = new BehaviorSubject<CallType>('ringing');
 
     public inTalkStatus = new Subject<CallIntalkSubtype>();
     public muted = new Subject<boolean>();
     public dtmf = new Subject<DTMFSignal>();
 
-    private _incomingStream: any;
+    public incomingStream = new BehaviorSubject<any>(null);
+
 
     private _localStream: JSSIPStream;
 
@@ -42,7 +43,6 @@ export class Session {
         if (this.direction === 'IN') {
             this.answerOptions = await this.callOptions.get();
         }
-
     }
 
     get direction(): CallDirection {
@@ -116,15 +116,7 @@ export class Session {
     }
 
     onStreamAdded(e) {
-        if (this.streamAddedCallback) {
-            this.streamAddedCallback(e.stream);
-        } else {
-            this._incomingStream = e.stream;
-        }
-    }
-
-    getIncomingStream() {
-        return this._incomingStream;
+        this.callOptions.outputStream(e.stream);
     }
 
     onDTMF(e) {
@@ -196,13 +188,6 @@ export class Session {
         this._session.sendDTMF(d);
     }
 
-    registerIncomingStreamCallback(fn: (data) => void) {
-        if (this._incomingStream) {
-            fn(this._incomingStream);
-        } else {
-            this.streamAddedCallback = fn;
-        }
-    }
 }
 
 

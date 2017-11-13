@@ -25,6 +25,8 @@ export class CallOptions {
     audioCtx: any;
     target: any;
 
+
+    public analyser: AnalyserNode;
     micEnabled = true;
     micStream: any;
 
@@ -54,7 +56,7 @@ export class CallOptions {
         return this.target;
     }
 
-    sendAudioBinary(binary: any) {
+    public sendAudioBinary(binary: any) {
 
         const len = binary.length;
         const bytes = new Uint8Array( len );
@@ -71,7 +73,7 @@ export class CallOptions {
 
     }
 
-    sendAudioBlob(blob: Blob) {
+    public sendAudioBlob(blob: Blob) {
 
         const audio0 = new Audio(window.URL.createObjectURL(blob));
 
@@ -96,12 +98,29 @@ export class CallOptions {
         }
     }
 
+    public outputStream(stream) {
+        const audioCtx = <any>new AudioContext();
+
+        // typescript doen't know 'createMediaStreamDestination' :(
+        this.analyser = <any>audioCtx.createAnalyser();
+
+        const target = audioCtx.createMediaStreamDestination();
+
+        const source = audioCtx.createMediaStreamSource(stream);
+        source.connect(this.analyser);
+        this.analyser.connect(target);
+
+        const audio = new Audio();
+        audio.autoplay = true;
+        audio.srcObject = stream;
+    }
+
     private async generateStream() {
 
         const mic = await navigator.mediaDevices.getUserMedia({ audio: this.audio, video: this.video });
 
+        // typescript doen't know 'createMediaStreamDestination' :(
         this.audioCtx = <any>new AudioContext();
-
         this.target = this.audioCtx.createMediaStreamDestination();
 
         this.micStream = this.audioCtx.createMediaStreamSource(mic);
@@ -109,6 +128,8 @@ export class CallOptions {
         this.micEnabled = true;
         return this.target['stream'];
     }
+
+
 
 
 

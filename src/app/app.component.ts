@@ -23,7 +23,6 @@ import { ConnectionStatus } from './core/utils';
 })
 export class AppComponent implements OnInit, OnDestroy {
 
-    @ViewChild('audioItem') audioElement;
     public connectionStatus: Observable<ConnectionStatus>;
     private alive = false;
 
