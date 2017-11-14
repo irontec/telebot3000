@@ -144,6 +144,7 @@ export class Session {
         console.log("eneded???");
         this.muted.complete();
         this.status.next('done');
+        this.callOptions.close();
         /*var startTime = this.moment(this.session.start_time);
         var endTime = this.moment(this.session.end_time);
         var duration = this.moment.duration(endTime.diff(startTime));

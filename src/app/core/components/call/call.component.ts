@@ -112,7 +112,7 @@ export class CallComponent implements OnInit, AfterViewInit {
             this.listen(blob);
         };
 
-        mediaRecorder.start(3500);
+        mediaRecorder.start(5000);
 
 
         call.status.subscribe(({ type, subtype }) => {
@@ -151,7 +151,7 @@ export class CallComponent implements OnInit, AfterViewInit {
      * @param analyser
      */
     private prepareVisualizer(analyser: AnalyserNode) {
-    if (!this.canvas.nativeElement) {
+    if (!this.canvas || !this.canvas.nativeElement) {
         return;
     }
     const canvas = this.canvas.nativeElement;

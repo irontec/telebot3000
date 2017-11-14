@@ -164,6 +164,9 @@ export class Call {
     }
 
     hydrate(raw) {
+        if (!raw) {
+          return false;
+        }
         this.id = raw.id;
         this.direction = raw.direction;
         this.duration = raw.duration;

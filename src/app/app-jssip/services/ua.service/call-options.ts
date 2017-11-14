@@ -36,7 +36,7 @@ export class CallOptions {
     outputAudio: HTMLAudioElement;
 
     constructor(private config: ConfigurationService) {
-
+      this.audioCtx = <any>new AudioContext();
     }
 
     async get() {
@@ -69,11 +69,12 @@ export class CallOptions {
 
             const source = this.audioCtx.createBufferSource();
             source.buffer = buffer;
-            const gainNode = this.audioCtx.createGain();
-            gainNode.gain.value = 0.9;
-            gainNode.connect(this.target);
 
-            source.connect(this.target);
+            const gainNode = this.audioCtx.createGain();
+            gainNode.gain.value = 1;
+            source.connect(gainNode);
+
+            gainNode.connect(this.target);
             source.start(0);
         }).catch(e => console.log('ERROR decoding audio!', e));
 
@@ -115,14 +116,14 @@ export class CallOptions {
     }
 
     public outputStream(stream) {
-        const audioCtx = <any>new AudioContext();
+
         this.output = stream;
         // typescript doen't know 'createMediaStreamDestination' :(
-        this.analyser = <any>audioCtx.createAnalyser();
+        this.analyser = <any>this.audioCtx.createAnalyser();
 
-        const target = audioCtx.createMediaStreamDestination();
+        const target = this.audioCtx.createMediaStreamDestination();
 
-        const source = audioCtx.createMediaStreamSource(stream);
+        const source = this.audioCtx.createMediaStreamSource(stream);
         source.connect(this.analyser);
         this.analyser.connect(target);
 
@@ -136,7 +137,7 @@ export class CallOptions {
         const mic = await navigator.mediaDevices.getUserMedia({ audio: this.hasAudio, video: this.hasVideo });
 
         // typescript doen't know 'createMediaStreamDestination' :(
-        this.audioCtx = <any>new AudioContext();
+
         this.target = this.audioCtx.createMediaStreamDestination();
 
         this.micStream = this.audioCtx.createMediaStreamSource(mic);
@@ -146,7 +147,9 @@ export class CallOptions {
     }
 
 
-
+    public close() {
+      this.audioCtx.close();
+    }
 
 
 
