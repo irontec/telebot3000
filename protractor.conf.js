@@ -23,6 +23,7 @@ exports.config = {
       args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'],
     }
   },
+  restartBrowserBetweenTests: true,
   directConnect: true,
   baseUrl: 'http://localhost:4200/',
   framework: 'jasmine',

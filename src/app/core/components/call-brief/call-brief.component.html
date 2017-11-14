@@ -16,7 +16,7 @@
 
   <div *ngIf="call.living; else deadCall">
 
-    <button *ngIf="call.direction === 'IN' && status.type === 'ringing'" mat-mini-fab color="primary" (click)="call.answer()">
+    <button class="answer" *ngIf="call.direction === 'IN' && status.type === 'ringing'" mat-mini-fab color="primary" (click)="call.answer()">
       <mat-icon aria-label="answer">call</mat-icon>
     </button>
 

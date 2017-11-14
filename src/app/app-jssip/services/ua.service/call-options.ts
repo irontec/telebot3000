@@ -71,11 +71,11 @@ export class CallOptions {
             source.buffer = buffer;
 
             const gainNode = this.audioCtx.createGain();
-            gainNode.gain.value = 1;
+            gainNode.gain.value = 2;
             source.connect(gainNode);
-
             gainNode.connect(this.target);
             source.start(0);
+
         }).catch(e => console.log('ERROR decoding audio!', e));
 
     }
