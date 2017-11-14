@@ -32,7 +32,7 @@
     <button *ngIf="status.type === 'active' && status.subtype !== 'hold'" mat-mini-fab color="basic" (click)="call.hold()">
       <mat-icon>phone_paused</mat-icon>
     </button>
-    <button class="call-details" *ngIf="source === 'list' && status.type === 'active'" mat-mini-fab [routerLink]="['/call', call.id]">
+    <button class="callDetails" *ngIf="source === 'list' && status.type === 'active'" mat-mini-fab [routerLink]="['/call', call.id]">
       <mat-icon>add</mat-icon>
     </button>
     <button *ngIf="source === 'call'" mat-mini-fab [routerLink]="['/callslist']">

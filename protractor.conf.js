@@ -20,7 +20,7 @@ exports.config = {
   capabilities: {
     'browserName': 'chrome',
     'chromeOptions': {
-      args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'],
+      args: ['--use-fake-ui-for-media-stream'],
     }
   },
   restartBrowserBetweenTests: true,
