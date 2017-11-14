@@ -10,7 +10,7 @@ import { ConfigurationStoreService } from './app-jssip/services/configuration-st
 import { ConfigurationService } from './app-jssip/services/configuration.service';
 import { CallspollService } from './app-jssip/services/callspoll.service';
 import { UaService } from './app-jssip/services/ua.service';
-import { UAMessage, UAregisteredData, UAnewRTCSessionData} from './app-jssip/utils';
+import { UAMessage, UAregisteredData, UAnewRTCSessionData } from './app-jssip/utils';
 import { Call } from './app-jssip/services/ua.service/call';
 import { ConnectionStatus } from './core/utils';
 
@@ -29,6 +29,7 @@ export class AppComponent implements OnInit, OnDestroy {
     constructor(
         private configuration: ConfigurationService,
         private configurationStore: ConfigurationStoreService,
+
         private callsPool: CallspollService,
         public UA: UaService,
         private router: Router
@@ -48,27 +49,34 @@ export class AppComponent implements OnInit, OnDestroy {
 
         // Manage incoming/outgoing calls
         this.UA.notifier
-                .filter(uaMsg => uaMsg.event === 'newRTCSession')
-                .map(uaMsg => uaMsg.data)
-                .takeWhile(() => this.alive)
-                .subscribe((rtcData: UAnewRTCSessionData) => {
+            .filter(uaMsg => uaMsg.event === 'newRTCSession')
+            .map(uaMsg => uaMsg.data)
+            .takeWhile(() => this.alive)
+            .subscribe((rtcData: UAnewRTCSessionData) => {
 
-                    const call = new Call();
-                    call.setSession(rtcData);
+                const call = new Call();
+                call.setSession(rtcData);
 
-                    this.callsPool.addCall(call);
+                this.callsPool.addCall(call);
 
-                    this.router.navigate(['callslist']);
-                });
+                this.router.navigate(['callslist']);
+            });
     }
-
+    convertUint8ArrayToBinaryString(u8Array) {
+        let i, b_str = '';
+        const len = u8Array.length;
+        for (i = 0; i < len; i++) {
+            b_str += String.fromCharCode(u8Array[i]);
+        }
+        return b_str;
+    }
 
     private _generateConnectionStatusFeed(): Observable<ConnectionStatus> {
 
         return this.UA.notifier
 
             .filter(
-               (message: UAMessage) => ['registered', 'disconnected'].indexOf(message.event) !== -1
+            (message: UAMessage) => ['registered', 'disconnected'].indexOf(message.event) !== -1
             )
             .map((message: UAMessage) => {
 

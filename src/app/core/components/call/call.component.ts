@@ -5,9 +5,14 @@ import { Call } from './../../../app-jssip/services/ua.service/call';
 import { ConfigurationService } from './../../../app-jssip/services/configuration.service';
 
 import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
 import { empty } from 'rxjs/observable/empty';
-import { HttpClient } from '@angular/common/http';
 import { bingSpeech } from 'cognitive-services';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import * as msr from 'msr';
+
+
+
 @Component({
     selector: 'app-call',
     templateUrl: './call.component.html',
@@ -19,6 +24,8 @@ export class CallComponent implements OnInit, AfterViewInit {
 
     public currentCall: Observable<Call>;
     private analyser: AnalyserNode;
+    private sentences = new Subject<string>();
+    public words: Observable<string[]>;
 
     constructor(
         private config: ConfigurationService,
@@ -35,17 +42,28 @@ export class CallComponent implements OnInit, AfterViewInit {
                 if (params['id']) {
                     const call = this.callsPool.getCallById(params['id']);
                     if (call && call.living) {
+                        // We ref incomng audio analyser
                         this.analyser = call.getCallOptions().analyser;
+                        // We set up speach recognition
+                        this.prepareListening(call);
+
                         return Observable.of(call);
                     }
                 }
                 this.router.navigate(['callslist']);
                 return empty();
             });
+
+        this.words = this.sentences.asObservable().scan((current, word) => [word, ...current], []);
     }
 
+
     ngAfterViewInit() {
-        this._prepareVisalizer(this.analyser);
+        /**
+         * We need canvas to be settled down
+         */
+        this.prepareVisualizer(this.analyser);
+
     }
 
     sendSound(call, path) {
@@ -80,74 +98,118 @@ export class CallComponent implements OnInit, AfterViewInit {
 
     }
 
-    prepareListening(call) {
+    private prepareListening(call) {
+        const stream = call.getCallOptions().output;
+
+        //curl -v -X POST "https://speech.platform.bing.com/speech/recognition/conversation/cognitiveservices/v1?language=es-es&format=detailed" -H "Transfer-Encoding: chunked" -H "Ocp-Apim-Subscription-Key: b8cf5513ade1411ea9e8c447c75cd510" -H "Content-type: audio/wav; codec=audio/pcm; samplerate=16000" --data-binary @src/assets/deberes.wav
+
+
+
+        const mediaRecorder = new msr(stream);
+        mediaRecorder.mimeType = 'audio/wav'; // check this line for audio/wav
+        mediaRecorder.ondataavailable = (blob) => {
+            // POST/PUT "Blob" using FormData/XHR2
+            this.listen(blob);
+        };
+
+        mediaRecorder.start(3500);
+
+
+        call.status.subscribe(({ type, subtype }) => {
+            if (type === 'done') {
+                mediaRecorder.stop();
+            }
+        });
+    }
+
+    private listen(blob) {
+
+        const URL = 'https://speech.platform.bing.com/speech/recognition/'
+            + 'conversation/cognitiveservices/v1?language=es-es&format=detailed';
+
+        const headers = new HttpHeaders({
+            'Ocp-Apim-Subscription-Key': this.config.getRandomAzureKey(),
+            'Content-type': 'audio/wav; codec=audio/pcm; samplerate=16000'
+        });
+        this.http.post(URL, new File([blob], 'sound.wav'), {
+            headers,
+            responseType: 'json'
+        }).subscribe(response => {
+            if (response['RecognitionStatus']  && response['RecognitionStatus'] ===  'Success'
+                    && response['NBest'] && response['NBest'][0]) {
+                const sentence = response['NBest'][0].Lexical;
+                this.sentences.next(sentence);
+            }
+
+        });
 
     }
+
 
     /**
      * Code taken from: https://github.com/mdn/voice-change-o-matic/blob/gh-pages/scripts/app.js#L123-L167
      * @param analyser
      */
-    private _prepareVisalizer(analyser: AnalyserNode) {
-        if (!this.canvas.nativeElement) {
-            return;
-        }
-        const canvas = this.canvas.nativeElement;
-        const canvasCtx = canvas.getContext('2d');
+    private prepareVisualizer(analyser: AnalyserNode) {
+    if (!this.canvas.nativeElement) {
+        return;
+    }
+    const canvas = this.canvas.nativeElement;
+    const canvasCtx = canvas.getContext('2d');
 
-        const WIDTH = canvas.width;
-        const HEIGHT = canvas.height;
-        let drawVisual;
+    const WIDTH = canvas.width;
+    const HEIGHT = canvas.height;
+    let drawVisual;
 
-        return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
 
-            analyser.fftSize = 2048;
-            const bufferLength = analyser.fftSize;
-            const dataArray = new Uint8Array(bufferLength);
+        analyser.fftSize = 2048;
+        const bufferLength = analyser.fftSize;
+        const dataArray = new Uint8Array(bufferLength);
 
-            canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
+        canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
 
-            const draw = function() {
+        const draw = function () {
 
-              drawVisual = requestAnimationFrame(draw);
+            drawVisual = requestAnimationFrame(draw);
 
-              analyser.getByteTimeDomainData(dataArray);
+            analyser.getByteTimeDomainData(dataArray);
 
-              canvasCtx.fillStyle = 'rgb(250, 250, 250)';
-              canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
+            canvasCtx.fillStyle = 'rgb(250, 250, 250)';
+            canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
 
-              canvasCtx.lineWidth = 1;
-              canvasCtx.strokeStyle = 'rgb(0, 0, 0)';
+            canvasCtx.lineWidth = 1;
+            canvasCtx.strokeStyle = 'rgb(0, 0, 0)';
 
-              canvasCtx.beginPath();
+            canvasCtx.beginPath();
 
-              const sliceWidth = WIDTH * 1.0 / bufferLength;
-              let x = 0;
+            const sliceWidth = WIDTH * 1.0 / bufferLength;
+            let x = 0;
 
-              for (let i = 0; i < bufferLength; i++) {
+            for (let i = 0; i < bufferLength; i++) {
 
                 const v = dataArray[i] / 128.0;
                 const y = v * (HEIGHT / 2);
 
                 if (i === 0) {
-                  canvasCtx.moveTo(x, y);
+                    canvasCtx.moveTo(x, y);
                 } else {
-                  canvasCtx.lineTo(x, y);
+                    canvasCtx.lineTo(x, y);
                 }
 
                 x += sliceWidth;
-              }
+            }
 
-              canvasCtx.lineTo(canvas.width, canvas.height / 2);
-              canvasCtx.stroke();
-            };
+            canvasCtx.lineTo(canvas.width, canvas.height / 2);
+            canvasCtx.stroke();
+        };
 
-            draw();
+        draw();
 
 
-        });
+    });
 
-    }
+}
 
 
 }

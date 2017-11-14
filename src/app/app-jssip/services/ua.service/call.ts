@@ -28,6 +28,7 @@ export class Call {
     public living = false;
     public duration: number;
     public micEnabled = true;
+    public speakerEnabled = true;
     public liveDuration: Observable<number>;
     public incomingDTMF: Observable<string>;
     public outgoingDTMF: Observable<string>;
@@ -178,6 +179,11 @@ export class Call {
     toggleMic() {
         this.micEnabled = !this.micEnabled;
         this._session.callOptions.toggleMic();
+    }
+
+    toggleSpeaker() {
+        this.speakerEnabled = !this.speakerEnabled;
+        this._session.callOptions.toggleSpeaker();
     }
 
     get icon() {

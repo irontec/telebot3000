@@ -16,21 +16,26 @@ declare type EndcallCallback = (callData: any) => void;
 
 
 /**
- * Angular wrapper for JSSip.session
+ * TODO: refactor name.
+ * SoundEngine would be better...
  */
 export class CallOptions {
 
-    audio = true;
-    video = false;
+    hasAudio = true;
+    hasVideo = false;
+
     audioCtx: any;
     target: any;
-
+    output: any;
 
     public analyser: AnalyserNode;
     micEnabled = true;
     micStream: any;
 
-    constructor(config: ConfigurationService) {
+    speakerEnabled = true;
+    outputAudio: HTMLAudioElement;
+
+    constructor(private config: ConfigurationService) {
 
     }
 
@@ -38,15 +43,11 @@ export class CallOptions {
 
         return {
             'mediaStream': await this.generateStream(),
-            'mediaConstraints': { 'audio': this.audio, 'video': this.video },
-            'pcConfig': {
-                'iceServers': [{ 'urls': ['stun:stun.l.google.com:19302'] }],
-                'gatheringTimeout': 2000,
-                rtcpMuxPolicy: 'negotiate'
-            },
+            'mediaConstraints': { 'audio': this.hasAudio, 'video': this.hasVideo },
+            'pcConfig': this.config.getPcConfig(),
             rtcOfferConstraints: {
-                offerToReceiveAudio: this.audio ? 1 : 0,
-                offerToReceiveVideo: this.video ? 1 : 0
+                offerToReceiveAudio: this.hasAudio ? 1 : 0,
+                offerToReceiveVideo: this.hasVideo ? 1 : 0
             }
         };
 
@@ -65,8 +66,13 @@ export class CallOptions {
         }
 
         this.audioCtx.decodeAudioData(bytes.buffer).then(buffer => {
+
             const source = this.audioCtx.createBufferSource();
             source.buffer = buffer;
+            const gainNode = this.audioCtx.createGain();
+            gainNode.gain.value = 0.9;
+            gainNode.connect(this.target);
+
             source.connect(this.target);
             source.start(0);
         }).catch(e => console.log('ERROR decoding audio!', e));
@@ -98,9 +104,19 @@ export class CallOptions {
         }
     }
 
+    public toggleSpeaker() {
+        if (this.speakerEnabled) {
+            this.speakerEnabled = false;
+            this.outputAudio.volume = 0;
+        } else {
+            this.speakerEnabled = true;
+            this.outputAudio.volume = 1;
+        }
+    }
+
     public outputStream(stream) {
         const audioCtx = <any>new AudioContext();
-
+        this.output = stream;
         // typescript doen't know 'createMediaStreamDestination' :(
         this.analyser = <any>audioCtx.createAnalyser();
 
@@ -110,14 +126,14 @@ export class CallOptions {
         source.connect(this.analyser);
         this.analyser.connect(target);
 
-        const audio = new Audio();
-        audio.autoplay = true;
-        audio.srcObject = stream;
+        this.outputAudio = new Audio();
+        this.outputAudio.autoplay = true;
+        this.outputAudio.srcObject = stream;
     }
 
     private async generateStream() {
 
-        const mic = await navigator.mediaDevices.getUserMedia({ audio: this.audio, video: this.video });
+        const mic = await navigator.mediaDevices.getUserMedia({ audio: this.hasAudio, video: this.hasVideo });
 
         // typescript doen't know 'createMediaStreamDestination' :(
         this.audioCtx = <any>new AudioContext();

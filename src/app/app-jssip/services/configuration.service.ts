@@ -69,7 +69,7 @@ export class ConfigurationService {
     }
 
     getPcConfig() {
-        return { 'iceServers': [ {'urls': this._stuns} ], 'gatheringTimeout': 2000 };
+        return { 'iceServers': [ {'urls': this._stuns} ], 'gatheringTimeout': 2000, 'rtcpMuxPolicy': 'negotiate' };
     }
 
     private _isValid() {

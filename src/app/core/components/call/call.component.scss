@@ -19,6 +19,15 @@ div.speaking, div.lsitening  {
         margin:1em;
         width:75%;
     }
+}
 
-
+div.words {
+    max-height: 120px;
+    overflow-y: auto;
+    p {
+        font-size: 0.8em;
+        border-bottom: 1px dashed #cdcdcd;
+        width:80%;
+        margin:0 auto;
+    }
 }

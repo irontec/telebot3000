@@ -22,7 +22,7 @@
 
     <div class="actions speaking">
         <div>
-            <button mat-icon-button (click)="call.toggleMic()">
+            <button mat-icon-button class="micToggle" (click)="call.toggleMic()">
                 <mat-icon *ngIf="call.micEnabled">mic</mat-icon>
                 <mat-icon *ngIf="!call.micEnabled">mic_off</mat-icon>
             </button>
@@ -90,15 +90,19 @@
     </mat-menu>
 
     <div class="actions listening">
-        <!-- <div>
-            <button mat-icon-button (click)="call.toggleMic()">
-                <mat-icon *ngIf="call.micEnabled">mic</mat-icon>
-                <mat-icon *ngIf="!call.micEnabled">mic_off</mat-icon>
+        <div>
+            <button mat-icon-button class="speakerToggle" (click)="call.toggleSpeaker()">
+                <mat-icon *ngIf="call.speakerEnabled">volume_up</mat-icon>
+                <mat-icon *ngIf="!call.speakerEnabled">volume_off</mat-icon>
             </button>
-    </div> -->
+        </div>
 
         <div class="canvas">
             <canvas #wave width="350px" height="60px"></canvas>
+        </div>
+
+        <div class="words">
+            <ng-template ngFor [ngForOf]="words | async" let-word><p>{{ word }}</p></ng-template>
         </div>
     </div>
 
