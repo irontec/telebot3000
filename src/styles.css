@@ -1,7 +1,7 @@
 @import '~https://fonts.googleapis.com/icon?family=Material+Icons';
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 body {
-  margin: 7% auto;
+  margin: 1% auto;
   font-family: Roboto, sans-serif;
   max-width: 500px;
   max-height: 800px;

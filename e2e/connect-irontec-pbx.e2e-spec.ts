@@ -1,7 +1,7 @@
 import { browser, by, element, Ptor } from 'protractor';
 import { passwords } from './../MY-PASSWORDS';
 
-xdescribe('telebot3000 App (to PBX Endpoint)', () => {
+ xdescribe('telebot3000 App (to PBX Endpoint)', () => {
 
   const ICON_IN_TALK = 'phone_in_talk';
   const ICON_ENDED = 'call_end';
@@ -74,7 +74,7 @@ xdescribe('telebot3000 App (to PBX Endpoint)', () => {
       expect(statusIcon).toEqual(ICON_IN_TALK);
 
       // click on the details button
-      element(by.css('button.call-details')).click();
+      element(by.css('button.callDetails')).click();
 
       // show dtmf menu
       element(by.css('.dtmf button')).click();
@@ -123,7 +123,7 @@ xdescribe('telebot3000 App (to PBX Endpoint)', () => {
       expect(statusIcon).toEqual(ICON_IN_TALK);
 
       // click on the details button
-      element(by.css('button.call-details')).click();
+      element(by.css('button.callDetails')).click();
 
       // show dtmf menu
       element(by.css('.dtmf button')).click();
