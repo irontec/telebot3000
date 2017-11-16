@@ -34,3 +34,7 @@ Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protrac
 ## Icon
 
 Icons made by [Freepik](http://www.freepik.com) from [www.flaticon.com](https://www.flaticon.com) is licensed by [CC 3.0 BY](http://creativecommons.org/licenses/by/3.0/).
+
+### License
+
+[EUPL v1.1](https://github.com/irontec/telebot3000/blob/master/LICENSE.txt)
